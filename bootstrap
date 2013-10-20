@@ -1,0 +1,46 @@
+---- This is main "Bootstrap" for all my programs
+---- Load this into turtle and execute to setup turtle for further work
+local UPDATER_PROGNAME = "bootstrap"
+local UPDATER_CODE = "LmJ6Fjb0"
+
+local PASTEBIN_GIT_API = "xcHUCK2t"
+
+local FILE_GIT_API = "git_api"
+
+local args = { ... }
+------ UPDATE CODE ----------------
+function update()
+	updater(UPDATER_PROGNAME, UPDATER_CODE) -- customize here
+end
+
+function updater_cmdline(args)
+	if #args > 0 and args[1] == "update" then
+			update()
+			error() -- exit after update
+	end
+end
+
+function updater(progName, code)
+	fs.makeDir("updaterBackup")
+	local updateFile = progName.."_update"
+	local progFile = progName
+	local backupFile = fs.combine("updaterBackup", progName.."_backup")
+	fs.delete(updateFile)
+	shell.run("pastebin","get",code,updateFile)
+	if fs.exists(updateFile) then
+		fs.delete(backupFile)
+		if fs.exists(progFile) then
+				fs.move(progFile, backupFile)
+		end
+		fs.move(updateFile, progFile)
+	end
+end
+------ UPDATE CODE END ----------------
+updater_cmdline(args)
+
+if not(fs.exists(FILE_GIT_API)) then
+	updater(FILE_GIT_API, PASTEBIN_GIT_API)
+end
+
+os.loadAPI("git_api")
+git_api.get("the-vindex", "minecraft-main", "master", "contents", "contents")
