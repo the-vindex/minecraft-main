@@ -1,0 +1,20 @@
+os.unloadAPI("git_api")
+os.loadAPI("git_api")
+
+function getMain(path, filename)
+	git_api.get("the-vindex", "minecraft-main", "master", path, filename)
+end
+
+local contentsFile = fs.open("contents", "r")
+local line = nil
+local files = {}
+
+while (line = contentsFile.readLine()) do
+	files[#files+1] = line
+end
+
+contentsFile.close()
+
+for i,v in ipairs(files) do
+	print(i, v)
+end
