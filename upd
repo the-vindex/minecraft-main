@@ -1,7 +1,7 @@
 os.unloadAPI("git_api")
 os.loadAPI("git_api")
 
-function getMain(path, filename)
+function getFile(path, filename)
 	git_api.get("the-vindex", "minecraft-main", "master", path, filename)
 end
 
@@ -17,6 +17,15 @@ end
 
 contentsFile.close()
 
-for i,v in ipairs(files) do
+for i,filePath in ipairs(files) do
 	print(i, v)
+	if not(fs.exists(filePath) then
+		--create directory structure
+		fs.makeDir(filePath)
+		--this is dirty, but I don't want to parse the path myself
+		--delete last directory so that we can place file there
+		fs.delete(filePath)
+	end
+	
+	getFile(filePath,filePath)
 end
