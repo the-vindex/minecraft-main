@@ -30,7 +30,11 @@ function updater(progName, code)
 	if not git_api then
 		shell.run("pastebin","get",code,updateFile)
 	else
-		git_api.get("the-vindex", "minecraft-main", "master", progName, updateFile)
+		local result = git_api.get("the-vindex", "minecraft-main", "master", progName, updateFile)
+    if not(result) then
+      print("update failed")
+      return false
+    end
 	end
 	
 	if fs.exists(updateFile) then
@@ -40,6 +44,7 @@ function updater(progName, code)
 		end
 		fs.move(updateFile, progFile)
 	end
+  return true
 end
 ------ UPDATE CODE END ----------------
 updater_cmdline(args)
