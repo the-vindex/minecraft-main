@@ -30,7 +30,7 @@ function updater(progName, code)
 	if not git_api then
 		shell.run("pastebin","get",code,updateFile)
 	else
-		git_api.get("the-vindex", "minecraft-main", "master", "bootstrap", "bootstrap")
+		git_api.get("the-vindex", "minecraft-main", "master", progName, updateFile)
 	end
 	
 	if fs.exists(updateFile) then
