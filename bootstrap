@@ -15,8 +15,8 @@ end
 
 function updater_cmdline(args)
 	if #args > 0 and args[1] == "update" then
-			update()
-			error() -- exit after update
+		update()
+		error() -- exit after update
 	end
 end
 
@@ -31,10 +31,10 @@ function updater(progName, code)
 		shell.run("pastebin","get",code,updateFile)
 	else
 		local result = git_api.get("the-vindex", "minecraft-main", "master", progName, updateFile)
-    if not(result) then
-      print("update failed")
-      return false
-    end
+		if not(result) then
+			print("update failed")
+			return false
+		end
 	end
 	
 	if fs.exists(updateFile) then
