@@ -1,0 +1,15 @@
+function printApi(obj)
+	local count = 0
+	for i,v in pairs(p) do
+		print(i)
+		count = count + 1
+		if count == 7 then
+			io.read()
+			count = 0
+		end
+	end
+end
+
+p = peripheral.wrap("front")
+
+printApi(p)
