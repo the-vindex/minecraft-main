@@ -26,11 +26,17 @@ function updater(progName, code)
 	local progFile = progName
 	local backupFile = fs.combine("updaterBackup", progName.."_backup")
 	fs.delete(updateFile)
-	shell.run("pastebin","get",code,updateFile)
+	
+	if not git_api then
+		shell.run("pastebin","get",code,updateFile)
+	else
+		git_api.get("the-vindex", "minecraft-main", "master", "bootstrap", "bootstrap")
+	end
+	
 	if fs.exists(updateFile) then
 		fs.delete(backupFile)
 		if fs.exists(progFile) then
-				fs.move(progFile, backupFile)
+			fs.move(progFile, backupFile)
 		end
 		fs.move(updateFile, progFile)
 	end
@@ -44,3 +50,4 @@ end
 
 os.loadAPI("git_api")
 git_api.get("the-vindex", "minecraft-main", "master", "contents", "contents")
+git_api.get("the-vindex", "minecraft-main", "master", "upd", "upd")

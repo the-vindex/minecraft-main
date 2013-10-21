@@ -9,8 +9,10 @@ local contentsFile = fs.open("contents", "r")
 local line = nil
 local files = {}
 
-while (line = contentsFile.readLine()) do
+line = contentsFile.readLine()
+while (line) do
 	files[#files+1] = line
+  line = contentsFile.readLine()
 end
 
 contentsFile.close()
