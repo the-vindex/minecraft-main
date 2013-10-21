@@ -18,7 +18,7 @@ end
 contentsFile.close()
 
 for i,filePath in ipairs(files) do
-	print(i, v)
+	print(i, filePath)
 	if not(fs.exists(filePath)) then
 		--create directory structure
 		fs.makeDir(filePath)
