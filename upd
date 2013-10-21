@@ -19,7 +19,7 @@ contentsFile.close()
 
 for i,filePath in ipairs(files) do
 	print(i, v)
-	if not(fs.exists(filePath) then
+	if not(fs.exists(filePath)) then
 		--create directory structure
 		fs.makeDir(filePath)
 		--this is dirty, but I don't want to parse the path myself
