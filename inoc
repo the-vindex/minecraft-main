@@ -11,14 +11,16 @@ function printApi(obj)
 end
 
 function printInventory(inv)
+    local text = ""
 	for i = 0,inv.getSizeInventory() do
 		local slot = inv.getStackInSlot(i)
 		if slot ~= nil then
 			for key, value in pairs(slot) do
-				print(key .. " = " .. tostring(value))
+				text = text .. key .. " = " .. tostring(value))
 			end
 		end
 	end
+	textutils.pagedPrint(text)
 end
 
 p = peripheral.wrap("front")
