@@ -11,7 +11,7 @@ function printApi(obj)
 end
 
 function printInventory(inv)
-	for i = 0..inv.getSizeInventory() do
+	for i = 0,inv.getSizeInventory() do
 		local slot = inv.getStackInSlot(i)
 		if slot ~= nil then
 			for key, value in pairs(slot) do
