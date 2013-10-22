@@ -10,6 +10,17 @@ function printApi(obj)
 	end
 end
 
-p = peripheral.wrap("front")
+function printInventory(inv)
+	for i = 0..inv.getSizeInventory() do
+		local slot = inv.getStackInSlot(i)
+		if slot ~= nil then
+			for key, value in pairs(slot) do
+				print(key .. " = " .. tostring(value))
+			end
+		end
+	end
+end
 
-printApi(p)
+p = peripheral.wrap("front")
+printInventory(p)
+--printApi(p)
