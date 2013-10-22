@@ -16,7 +16,7 @@ function printInventory(inv)
 		local slot = inv.getStackInSlot(i)
 		if slot ~= nil then
 			for key, value in pairs(slot) do
-				text = text..key.. " = " .. tostring(value))
+				text = text..key.. " = " .. tostring(value)
 			end
 		end
 	end
