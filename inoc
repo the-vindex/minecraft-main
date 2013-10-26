@@ -1,13 +1,15 @@
 function printApi(obj)
 	local count = 0
+	local text= ""
 	for i,v in pairs(p) do
-		print(i)
+		text = text .. i
 		count = count + 1
 		if count == 7 then
 			io.read()
 			count = 0
 		end
 	end
+	textutils.pagedPrint(text)
 end
 
 function printInventory(inv)
@@ -26,4 +28,17 @@ end
 
 p = peripheral.wrap("front")
 printInventory(p)
---printApi(p)
+printApi(p)
+
+
+------General info
+-- All slots are OpenPeripheral numbers based from 0.
+-- Inoculator:
+-- slot 2 - bee being inoculated right now
+-- slot 3..8 - backlog 1..6
+-- slot 9..14 - output 1..6
+-- slot 15 - serum
+
+----- Serum
+-- Name - what is this
+-- dmg - number of charges missing from full (dmg=4 => 12 charges)
