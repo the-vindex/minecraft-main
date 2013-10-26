@@ -2,7 +2,7 @@ function printApi(obj)
 	local count = 0
 	local text= ""
 	for i,v in pairs(p) do
-		text = text .. i
+		text = text .. i .. "\n"
 		count = count + 1
 		if count == 7 then
 			io.read()
