@@ -50,7 +50,7 @@ end
 
 function isAllSlotsEmpty(dataTable)
 	local empty = true
-	for i,v in ipairs(dataTable)
+	for i,v in ipairs(dataTable) do
 		if not(isSlotEmpty(dataTable,i)) then
 			empty = false
 		end
