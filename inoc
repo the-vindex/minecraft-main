@@ -37,7 +37,7 @@ local SLOT_OCCUPIED = "present"
 local SLOT_EMPTY = "empty"
 
 function processSlotInfo(slotInfo, intoLocalInfo, index)
-	if slot ~= nil then
+	if slotInfo ~= nil then
 		intoLocalInfo[index] = SLOT_OCCUPIED
 	else
 		intoLocalInfo[index] = SLOT_EMPTY
