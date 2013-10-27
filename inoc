@@ -33,8 +33,13 @@ inoculator = peripheral.wrap("front")
 --printInventory(p)
 --printApi(p)
 
+local TURTLE_DIRECTION = "west"
 local SLOT_OCCUPIED = "present"
 local SLOT_EMPTY = "empty"
+
+local INOCULATOR_SERUM_SLOT=2
+local INOCULATOR_OUTPUT_SLOTS_START=9
+local INOCULATOR_INPUT_SLOTS_START=3
 
 function processSlotInfo(slotInfo, intoLocalInfo, index)
 	if slotInfo ~= nil then
@@ -58,6 +63,10 @@ function isAllSlotsEmpty(dataTable)
 	return empty
 end
 
+function isItemsPresent(dataTable)
+	return not(isAllSlotsEmpty(dataTable))
+end
+
 function getDataFromInoculator(inventoryStart,inventorySize,localData)
 	local index = 0
 	for i=inventoryStart,inventoryStart + inventorySize - 1 do
@@ -69,13 +78,21 @@ function getDataFromInoculator(inventoryStart,inventorySize,localData)
 	end
 end
 
+function getFirstEmptyTurtleSlot()
+	for i=1,16 do
+		if turtle.getItemCount(i) == 0 then
+			return i
+		end
+	end
+end
+
 local input = {}
 local output = {}
 local processing = {}
 local serum = {}
 
-getDataFromInoculator(3, 6, input) ------ INPUT SLOTS
-getDataFromInoculator(9, 6, output) ------ OUTPUT SLOTS
+getDataFromInoculator(INOCULATOR_INPUT_SLOTS_START, 6, input) ------ INPUT SLOTS
+getDataFromInoculator(INOCULATOR_OUTPUT_SLOTS_START, 6, output) ------ OUTPUT SLOTS
 getDataFromInoculator(15, 1, serum) ------ SERUM SLOT
 getDataFromInoculator(2, 1, processing) ------ PROCESSING SLOT
 
@@ -83,6 +100,16 @@ printArray(input)
 printArray(output)
 printArray(serum)
 printArray(processing)
+
+if isAllSlotsEmpty(input) and isAllSlotsEmpty(processing) and isItemsPresent(output) and isItemsPresent(serum) then
+	-- remove serum, move output to input. Expect new serum to come from the hopper above
+	inoculator.push(TURTLE_DIRECTION,INOCULATOR_SERUM_SLOT,1)
+	--local turtleBeeSlotsStart=10	
+	for i=0,5 do
+		--inoculator.pushIntoSlot(TURTLE_DIRECTION,INOCULATOR_OUTPUT_SLOTS_START+i,1,turtleBeeSlotsStart+i)
+		inoculator.swapStacks(INOCULATOR_OUTPUT_SLOTS_START+i,INOCULATOR_INPUT_SLOTS_START+i)
+	end
+end
 
 ------General info
 -- All slots are OpenPeripheral numbers based from 0.
