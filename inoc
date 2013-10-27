@@ -21,12 +21,16 @@ function printInventory(inv)
 	textutils.pagedPrint(text)
 end
 
-function printArray(arr)
+function printArray(arr,interactive)
 	local text = ""
 	for i,v in ipairs(arr) do
 		text = text .. i .. ":" .. v .. "\n"
 	end
-	textutils.pagedPrint(text)
+	if (interactive) then
+		textutils.pagedPrint(text)
+	else
+		print(text)
+	end
 end
 
 inoculator = peripheral.wrap("front")
@@ -96,12 +100,13 @@ getDataFromInoculator(INOCULATOR_OUTPUT_SLOTS_START, 6, output) ------ OUTPUT SL
 getDataFromInoculator(15, 1, serum) ------ SERUM SLOT
 getDataFromInoculator(2, 1, processing) ------ PROCESSING SLOT
 
-printArray(input)
-printArray(output)
-printArray(serum)
-printArray(processing)
+-- printArray(input)
+-- printArray(output)
+-- printArray(serum)
+-- printArray(processing)
 
 if isAllSlotsEmpty(input) and isAllSlotsEmpty(processing) and isItemsPresent(output) and isItemsPresent(serum) then
+	print("Conditions met, moving")
 	-- remove serum, move output to input. Expect new serum to come from the hopper above
 	inoculator.push(TURTLE_DIRECTION,INOCULATOR_SERUM_SLOT,1)
 	--local turtleBeeSlotsStart=10	
@@ -109,6 +114,8 @@ if isAllSlotsEmpty(input) and isAllSlotsEmpty(processing) and isItemsPresent(out
 		--inoculator.pushIntoSlot(TURTLE_DIRECTION,INOCULATOR_OUTPUT_SLOTS_START+i,1,turtleBeeSlotsStart+i)
 		inoculator.swapStacks(INOCULATOR_OUTPUT_SLOTS_START+i,INOCULATOR_INPUT_SLOTS_START+i)
 	end
+else
+	print("Conditions not met, exiting")
 end
 
 ------General info
