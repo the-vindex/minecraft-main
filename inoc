@@ -3,11 +3,6 @@ function printApi(obj)
 	local text= ""
 	for i,v in pairs(p) do
 		text = text .. i .. "\n"
-		count = count + 1
-		if count == 7 then
-			io.read()
-			count = 0
-		end
 	end
 	textutils.pagedPrint(text)
 end
@@ -26,10 +21,68 @@ function printInventory(inv)
 	textutils.pagedPrint(text)
 end
 
-p = peripheral.wrap("front")
-printInventory(p)
-printApi(p)
+function printArray(arr)
+	local text = ""
+	for i,v in ipairs(arr) do
+		text = text .. i .. ":" .. v .. "\n"
+	end
+	textutils.pagedPrint(text)
+end
 
+inoculator = peripheral.wrap("front")
+--printInventory(p)
+--printApi(p)
+
+local SLOT_OCCUPIED = "present"
+local SLOT_EMPTY = "empty"
+
+function processSlotInfo(slotInfo, intoLocalInfo, index)
+	if slot ~= nil then
+		intoLocalInfo[index] = SLOT_OCCUPIED
+	else
+		intoLocalInfo[index] = SLOT_EMPTY
+	end
+end
+
+function isSlotEmpty(dataTable, index)
+	return dataTable[index] == SLOT_EMPTY
+end
+
+function isAllSlotsEmpty(dataTable)
+	local empty = true
+	for i,v in ipairs(dataTable)
+		if not(isSlotEmpty(dataTable,i)) then
+			empty = false
+		end
+	end
+	return empty
+end
+
+function getDataFromInoculator(inventoryStart,inventorySize,localData)
+	local index = 0
+	for i=inventoryStart,inventoryStart + inventorySize - 1 do
+		index = index + 1
+		local slot = inoculator.getStackInSlot(i)
+		
+		processSlotInfo(slot, localData, index)
+		
+	end
+end
+
+local input = {}
+local output = {}
+local processing = {}
+local serum = {}
+
+getDataFromInoculator(3, 6, input) ------ INPUT SLOTS
+getDataFromInoculator(9, 6, output) ------ OUTPUT SLOTS
+getDataFromInoculator(15, 1, serum) ------ SERUM SLOT
+getDataFromInoculator(2, 1, processing) ------ PROCESSING SLOT
+
+printArray(input)
+printArray(output)
+printArray(serum)
+printArray(processing)
 
 ------General info
 -- All slots are OpenPeripheral numbers based from 0.
