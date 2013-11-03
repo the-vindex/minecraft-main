@@ -1,0 +1,164 @@
+function printApi(obj)
+	local count = 0
+	local text= ""
+	for i,v in pairs(p) do
+		text = text .. i .. "\n"
+	end
+	textutils.pagedPrint(text)
+end
+
+function printInventory(inv)
+    local text = ""
+	for i = 0,inv.getSizeInventory() do
+		local slot = inv.getStackInSlot(i)
+		if slot ~= nil then
+			text = text.."Slot number "..i.."\n"
+			for key, value in pairs(slot) do
+				text = text..key.. " = " .. tostring(value) .. "\n"
+			end
+		end
+	end
+	textutils.pagedPrint(text)
+end
+
+function printArray(arr,interactive)
+	local text = ""
+	for i,v in ipairs(arr) do
+		text = text .. i .. ":" .. v .. "\n"
+	end
+	if (interactive) then
+		textutils.pagedPrint(text)
+	else
+		print(text)
+	end
+end
+
+local DEBUG = true
+
+---------------------------------- Item CLASS
+local Item = {}
+Item.meta = {}
+Item.CLASSNAME = "Item"
+Item.uuid = function(id,dmg)
+				   if (dmg == nil ) then dmg = 0 end
+				   return id + dmg * 32768
+				end
+Item.className = function()
+					return Item.CLASSNAME
+				end
+Item.equals = function(self, other)
+					if (other == nil) then
+						return false
+					end
+					if (self.id == other.id and self.dmg == other.dmg) then
+						return true
+					else
+						return false
+					end
+				end
+				
+function Item:new(id, dmg, ignoreDmg)
+	if ignoreDmg == nil then ignoreDmg = false end
+	assert(type(ignoreDmg) == "boolean", "ignoreDmg must be boolean")
+	assert(id ~= nil and id >= 0)
+	assert(dmg ~= nil and dmg >= 0)
+	local o = {}
+	o.id = id
+	o.dmg = dmg
+	o.ignoreDmg = ignoreDmg
+	
+	setmetatable(o, self)
+	self.__index = self
+	return o
+end
+----------------------------------- Item CLASS END
+---------------------------------- ItemStack CLASS
+local ItemStack = {}
+function ItemStack:new(item, qty)
+	local o = {}
+	assert(item ~= nil and item.className ~= nil and item.className() == Item.CLASSNAME, "Item must be of type "..Item.CLASSNAME)
+	assert(qty ~= nil and qty >= 0, "Qty must be non-negative number")
+	
+	o.item = item
+	o.qty = qty
+	
+	setmetatable(o, self)
+	self.__index = self
+	return o
+end
+
+function ItemStack.sameItem(self, other)
+	if other == nil then return false end
+	
+	return self.item:equals(other.item)
+end
+---------------------------------- ItemStack CLASS END
+
+local IGNORE_DMG = -1
+function newItemStack(id, dmg, qty)
+	local ignoreDmg = false
+	if dmg == IGNORE_DMG then
+		ignoreDmg = true
+		dmg = 0
+	end
+	
+	return ItemStack:new(Item:new(id, dmg, ignoreDmg), qty)
+end
+
+function getItemFromSlotContents(opSlot)
+	return Item:new(opSlot.id, opSlot.dmg)
+end
+
+function fillTarget(src, tgt, config)
+	local allPlaced = true
+	for slotNumber, itemStack in pairs(config) do
+		if DEBUG then print('Checking target slot '..slotNumber) end
+		local needsPlacing = true
+		local tgtSlot = tgt.getStackInSlot(slotNumber)
+		if tgtSlot ~= nil then -- check if item is correct, otherwise remove it
+			if DEBUG then print('Slot contains item') end
+			if not(itemStack.item:equals(getItemFromSlotContents(tgtSlot))) then
+				if DEBUG then print('Slot contains wrong type of item. Removing.') end
+				
+				assert(tgt.pushIntoSlot("up", slotNumber, 64, 0))
+				turtle.select(1)
+				turtle.dropUp()
+			else
+				needsPlacing = false
+			end
+		end
+		
+		if needsPlacing then
+			if DEBUG then print('Looking for item to place in source chest') end
+			for i = 0, src.getSizeInventory()-1 do
+				local srcSlot = src.getStackInSlot(i)
+				if srcSlot ~= nil and itemStack.item:equals(getItemFromSlotContents(srcSlot)) then
+					print('Item found in source slot '..i)
+					assert(src.pushIntoSlot("down", i, 1, 0))
+					assert(tgt.pullIntoSlot("up", 0, 1, slotNumber))
+					needsPlacing = false
+				end
+			end
+		end
+		
+		-- if item still needs placing, then we were not successful - report, that another iteration will be needed
+		if needsPlacing then 
+			allPlaced = false
+		end
+	end
+	
+	return allPlaced
+end
+
+local config = {}
+config[0] = newItemStack(4,IGNORE_DMG, 1)
+config[5] = newItemStack(3,IGNORE_DMG, 1)
+
+local src = peripheral.wrap("top")
+local tgt = peripheral.wrap("bottom")
+
+-- while not placed all items, try to place then wait for refill of source chest
+while not(fillTarget(src,tgt,config)) do
+	sleep(5)
+end
+
