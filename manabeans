@@ -1,0 +1,170 @@
+local columnHeight = 60
+local currentSlot = 1
+local currentDirection = "up"
+local cycleCount = 1
+local stockHandle = nil
+local turnDirection = "right"
+
+function loopSlot()
+   local nextSlot = nil
+   if currentSlot<16 then
+      nextSlot = currentSlot+1
+   else
+      nextSlot = 1
+   end
+   turtle.select(nextSlot)
+   currentSlot = nextSlot
+end
+
+function place()
+   local limit=16
+   while turtle.getItemCount(currentSlot) == 0 and limit>0 do
+      loopSlot()
+	  limit = limit - 1
+   end
+   if limit == 0 then
+      print("Place limit reached - inventory empty")
+   end
+   print ("Items in current slot: ", turtle.getItemCount(currentSlot))
+   print ("Current slot: ", currentSlot)
+   return turtle.place()
+end
+
+function dig()
+   turtle.dig()
+end
+
+function turtleUp()
+   local limit = 5
+   for i = 1,5 do
+      if turtle.up() then
+	     return true
+	  else
+	     sleep(0.3)
+	  end
+   end
+   return false
+end
+
+function turtleDown()
+   local limit = 5
+   for i = 1,5 do
+      if turtle.down() then
+	     return true
+	  else
+	     sleep(0.3)
+	  end
+   end
+   return false
+end
+
+function move()
+   if currentDirection == "up" then
+      return turtleUp()
+   elseif currentDirection == "down" then
+      return turtleDown()
+   else
+      print("Unknown direction: ", currentDirection)
+      exit()
+   end
+end
+
+function revertDirection()
+   if currentDirection == "up" then
+      currentDirection = "down"
+   elseif currentDirection == "down" then
+      currentDirection = "up"
+   else
+      print("Unknown current direction: ", currentDirection)
+      exit()
+   end
+end
+
+function oneDirection()
+   currentSlot = 1
+   turtle.select(currentSlot)
+	
+   local movesInOneDir = 0
+   while movesInOneDir < columnHeight do
+      dig()
+      if not place() and currentDirection == "up" then
+	     print("Cannot place, breaking")
+	     break
+	  end
+      if not move() then
+         print("Can't go current direction, reverting")
+         break
+      end
+      movesInOneDir = movesInOneDir + 1
+   end
+end
+
+function turn()
+    if turnDirection == "right" then
+		turtle.turnRight()
+    elseif turnDirection == "left" then
+		turtle.turnLeft()
+	else
+		print("Incorrect turn direction, turning right")
+		turtle.turnRight()
+	end
+end
+
+function goUpAndDown()
+	
+	if turtle.getFuelLevel() < 300 then
+	   print("Error - low on fuel ", turtle.getFuelLevel())
+	   exit()
+	end
+	
+	resupplyBeans()
+	oneDirection()
+	revertDirection()
+	turn()
+
+	oneDirection()
+	revertDirection()
+	turn()
+end
+
+function resupplyBeans()    
+	-- refilling from filing cabinet below us
+	for i=1,16 do
+	   turtle.select(i)
+	   if stockHandle == "resupply" then
+	      turtle.suckDown()
+	   elseif stockHandle == "dump" then
+	      turtle.dropDown()
+	   elseif not stockHandle then
+	      -- doing nothing
+	   else 
+	      print("Wrong resupply command")
+		  exit()
+	   end
+	end
+end
+
+local args = {...}
+if args[1] and tonumber(args[1]) then
+   cycleCount = tonumber(args[1])
+end
+
+if args[2] == "resupply" then
+   stockHandle = "resupply"
+elseif args[2] == "dump" then
+   stockHandle = "dump"
+else 
+   print("No resupply command")
+end
+
+if args[3] == "left" then
+   turnDirection = "left"
+elseif args[3] == "right" then
+   turnDirection = "right"
+else
+   print("Using default turn direction")
+end
+
+for cycle = 1,cycleCount do
+   goUpAndDown()
+end
