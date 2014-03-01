@@ -79,5 +79,9 @@ while true do
 	reverseDirection()
 	print("Sleeping")
 	sleep(120)
+	for i=2,10 do
+		turtle.select(i)
+		turtle.transferTo(1)
+	end
 end
 
