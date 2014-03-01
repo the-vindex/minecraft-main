@@ -2,6 +2,10 @@ local DIR_LEFT = "left"
 local DIR_RIGHT = "right"
 
 local direction = DIR_LEFT
+local ITEM_TO_PLANT = 1
+local ITEM_TURN_AROUND_GUIDE = 15
+local ITEM_DIRECTION_GUIDE = 16
+
 
 function turnFinal()
 	if direction == DIR_LEFT then
@@ -11,7 +15,6 @@ function turnFinal()
 	end
 end
 
-local ITEM_DIRECTION_GUIDE = 16
 turtle.select(ITEM_DIRECTION_GUIDE)
 for i=1,4 do
 	local doBreak = 0
@@ -20,6 +23,34 @@ for i=1,4 do
 		break
 	else
 		turtle.turnLeft()
+	end
+end
+
+function moveForward()
+	for i=1,10 do
+		if turtle.forward() then
+			return true
+		end
+	end
+	return false
+end
+
+function plant()
+	turtle.turnLeft()
+	turtle.select(ITEM_TO_PLANT)
+	turtle.place()
+	turtle.turnRight()
+end
+
+function detectTurn()
+	turtle.select(ITEM_TURN_AROUND_GUIDE)
+	return turtle.compare()
+end
+
+while not detectTurn() do
+	plant()
+	if not moveForward() then
+		break
 	end
 end
 
