@@ -38,10 +38,20 @@ function moveForward()
 end
 
 function plant()
-	turtle.turnLeft()
+	--turn to placing direction
+	if direction == DIR_LEFT then
+		turtle.turnLeft()
+	else
+		turtle.turnRight()
+	end
 	turtle.select(ITEM_TO_PLANT)
 	turtle.place()
-	turtle.turnRight()
+	-- turn back
+	if direction == DIR_LEFT then
+		turtle.turnRight()
+	else
+		turtle.turnLeft()
+	end
 end
 
 function detectTurn()
