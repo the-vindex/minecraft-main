@@ -54,5 +54,7 @@ if not(fs.exists(FILE_GIT_API)) then
 end
 
 os.loadAPI("git_api")
+fs.delete("contents")
 git_api.get("the-vindex", "minecraft-main", "master", "contents", "contents")
+fs.delete("upd")
 git_api.get("the-vindex", "minecraft-main", "master", "upd", "upd")
