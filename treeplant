@@ -15,14 +15,16 @@ function turnFinal()
 	end
 end
 
-turtle.select(ITEM_DIRECTION_GUIDE)
-for i=1,4 do
-	local doBreak = 0
-	if turtle.compare() then
-		turnFinal()
-		break
-	else
-		turtle.turnLeft()
+function turnToCorrectDirection()
+	turtle.select(ITEM_DIRECTION_GUIDE)
+	for i=1,4 do
+		local doBreak = 0
+		if turtle.compare() then
+			turnFinal()
+			break
+		else
+			turtle.turnLeft()
+		end
 	end
 end
 
@@ -47,10 +49,23 @@ function detectTurn()
 	return turtle.compare()
 end
 
-while not detectTurn() do
-	plant()
-	if not moveForward() then
-		break
+function reverseDirection()
+	if direction == DIR_LEFT then
+		direction = DIR_RIGHT
+	else
+		direction = DIR_LEFT
 	end
+end
+
+while true do
+	turnToCorrectDirection()
+	while not detectTurn() do
+		plant()
+		if not moveForward() then
+			break
+		end
+	end
+	reverseDirection()
+	sleep(120)
 end
 
