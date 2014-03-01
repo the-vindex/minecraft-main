@@ -55,6 +55,7 @@ function reverseDirection()
 	else
 		direction = DIR_LEFT
 	end
+	print("New direction"..direction)
 end
 
 while true do
@@ -66,6 +67,7 @@ while true do
 		end
 	end
 	reverseDirection()
+	print("Sleeping")
 	sleep(120)
 end
 
