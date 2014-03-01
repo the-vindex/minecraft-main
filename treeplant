@@ -1,0 +1,25 @@
+local DIR_LEFT = "left"
+local DIR_RIGHT = "right"
+
+local direction = DIR_LEFT
+
+function turnFinal()
+	if direction == DIR_LEFT then
+		turtle.turnLeft()
+	else
+		turtle.turnRight()
+	end
+end
+
+local ITEM_DIRECTION_GUIDE = 16
+turtle.select(ITEM_DIRECTION_GUIDE)
+for i=1,4 do
+	local doBreak = 0
+	if turtle.compare() then
+		turnFinal()
+		break
+	else
+		turtle.turnLeft()
+	end
+end
+

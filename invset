@@ -109,7 +109,7 @@ function getItemFromSlotContents(opSlot)
 	return Item:new(opSlot.id, opSlot.dmg)
 end
 
-function fillTarget(src, tgt, config)
+function fillTarget(src, srcToTurtleDirection, tgt, tgtToTurtleDirection, config)
 	local allPlaced = true
 	for slotNumber, itemStack in pairs(config) do
 		if DEBUG then print('Checking target slot '..slotNumber) end
@@ -120,7 +120,7 @@ function fillTarget(src, tgt, config)
 			if not(itemStack.item:equals(getItemFromSlotContents(tgtSlot))) then
 				if DEBUG then print('Slot contains wrong type of item. Removing.') end
 				
-				assert(tgt.pushIntoSlot("up", slotNumber, 64, 0))
+				assert(tgt.pushIntoSlot(tgtToTurtleDirection, slotNumber, 64, 0))
 				turtle.select(1)
 				turtle.dropUp()
 			else
@@ -134,8 +134,8 @@ function fillTarget(src, tgt, config)
 				local srcSlot = src.getStackInSlot(i)
 				if srcSlot ~= nil and itemStack.item:equals(getItemFromSlotContents(srcSlot)) then
 					print('Item found in source slot '..i)
-					assert(src.pushIntoSlot("down", i, 1, 0))
-					assert(tgt.pullIntoSlot("up", 0, 1, slotNumber))
+					assert(src.pushIntoSlot(srcToTurtleDirection, i, 1, 0))
+					assert(tgt.pullIntoSlot(tgtToTurtleDirection, 0, 1, slotNumber))
 					needsPlacing = false
 				end
 			end

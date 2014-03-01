@@ -1,9 +1,10 @@
-local columnHeight = 60
+local columnHeight = 100
 local currentSlot = 1
 local currentDirection = "up"
 local cycleCount = 1
 local stockHandle = nil
 local turnDirection = "right"
+local dropMode = nil
 
 function loopSlot()
    local nextSlot = nil
@@ -12,8 +13,7 @@ function loopSlot()
    else
       nextSlot = 1
    end
-   turtle.select(nextSlot)
-   currentSlot = nextSlot
+   selectSlot(nextSlot)
 end
 
 function place()
@@ -31,7 +31,11 @@ function place()
 end
 
 function dig()
-   turtle.dig()
+   if turnDirection == "none" and currentDirection == "down" then
+      --do nothing
+   else 
+      turtle.dig()
+   end
 end
 
 function turtleUp()
@@ -80,9 +84,13 @@ function revertDirection()
    end
 end
 
+function selectSlot(slotNumber)
+   turtle.select(slotNumber)
+   currentSlot = slotNumber   
+end
+
 function oneDirection()
-   currentSlot = 1
-   turtle.select(currentSlot)
+   selectSlot(1)
 	
    local movesInOneDir = 0
    while movesInOneDir < columnHeight do
@@ -96,6 +104,12 @@ function oneDirection()
          break
       end
       movesInOneDir = movesInOneDir + 1
+	  if dropMode == "continousDrop" then
+	     selectSlot(2)
+		 turtle.dropDown()
+		 selectSlot(1)
+		 turtle.dropDown()
+	  end
    end
 end
 
@@ -104,6 +118,11 @@ function turn()
 		turtle.turnRight()
     elseif turnDirection == "left" then
 		turtle.turnLeft()
+    elseif turnDirection == "around" then
+		turtle.turnLeft()
+		turtle.turnLeft()
+    elseif turnDirection == "none" then
+		print("Turn direction = 'none', not turning")
 	else
 		print("Incorrect turn direction, turning right")
 		turtle.turnRight()
@@ -130,11 +149,13 @@ end
 function resupplyBeans()    
 	-- refilling from filing cabinet below us
 	for i=1,16 do
-	   turtle.select(i)
+	   selectSlot(i)
 	   if stockHandle == "resupply" then
 	      turtle.suckDown()
 	   elseif stockHandle == "dump" then
-	      turtle.dropDown()
+		-- we expect vacuum hopper to grab mana beans we drop
+	      turtle.drop()
+		  --turtle.dropDown()
 	   elseif not stockHandle then
 	      -- doing nothing
 	   else 
@@ -157,12 +178,16 @@ else
    print("No resupply command")
 end
 
-if args[3] == "left" then
-   turnDirection = "left"
-elseif args[3] == "right" then
-   turnDirection = "right"
+if args[3] == "left" or args[3] == "right" or args[3] == "around" or args[3] == "none" then
+   turnDirection = args[3]
 else
    print("Using default turn direction")
+end
+
+if args[4] == "continousDrop" then
+   dropMode = args[4]
+else
+   print("No special drop mode")
 end
 
 for cycle = 1,cycleCount do
