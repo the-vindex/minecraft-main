@@ -1,5 +1,5 @@
-local SLEEP_BETWEEN_TURNS = 1
-local SLEEP_REFUEL_FAIL = 5
+local SLEEP_BETWEEN_TURNS = 300
+local SLEEP_REFUEL_FAIL = 60
 
 local DIR_LEFT = "left"
 local DIR_RIGHT = "right"
