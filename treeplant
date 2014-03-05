@@ -81,7 +81,8 @@ function refuel()
 	if turtle.getFuelLevel() < 200 then
 		if turtle.getItemCount(ITEM_FUEL) > 1 then
 			turtle.select(ITEM_FUEL)
-			if turtle.refuel(math.max(0,turtle.getItemCount(ITEM_FUEL)-1)) then
+			--refuel at most 5 items, but do not leave slot empty and protect against wrong argument error (if <0 in refuel)
+			if turtle.refuel(math.max(0,math.min(5,turtle.getItemCount(ITEM_FUEL)-1))) then
 				return REFUEL_OK
 			else
 				print("Refuel failed for unknown reason")
