@@ -108,7 +108,7 @@ while true do
 	sleep(SLEEP_BETWEEN_TURNS)
 	for i=2,2 do
 		turtle.select(i)
-		turtle.transferTo(math.max(0,turtle.getItemCount(i)-1))
+		turtle.transferTo(1, math.max(0,turtle.getItemCount(i)-1))
 	end
 	if direction == DIR_RIGHT then
 		while not refuel() == REFUEL_OK do
