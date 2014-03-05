@@ -1,5 +1,5 @@
-local SLEEP_BETWEEN_TURNS = 300
-local SLEEP_REFUEL_FAIL = 60
+local SLEEP_BETWEEN_TURNS = 1
+local SLEEP_REFUEL_FAIL = 5
 
 local DIR_LEFT = "left"
 local DIR_RIGHT = "right"
@@ -77,6 +77,7 @@ end
 
 --- return value: 1 - everything ok, 0 - not enough fuel
 function refuel()
+	print("Current fuel level: "..turtle.getFuelLevel())
 	if turtle.getFuelLevel() < 200 then
 		if turtle.getItemCount(ITEM_FUEL) > 1 then
 			turtle.select(ITEM_FUEL)
