@@ -84,9 +84,11 @@ function refuel()
 			if turtle.refuel(math.max(0,turtle.getItemCount(ITEM_FUEL)-1)) then
 				return REFUEL_OK
 			else
+				print("Refuel failed for unknown reason")
 				return REFUEL_ERROR
 			end
 		else
+			print("Refuel error: low on fuel and no extra fuel")
 			return REFUEL_ERROR
 		end
 	else
