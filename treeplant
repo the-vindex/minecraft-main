@@ -10,8 +10,8 @@ local ITEM_FUEL = 14
 local ITEM_TURN_AROUND_GUIDE = 15
 local ITEM_DIRECTION_GUIDE = 16
 
-local REFUEL_OK = 1
-local REFUEL_ERROR = 0
+local REFUEL_OK = "ok"
+local REFUEL_ERROR = "error"
 
 function turnFinal()
 	if direction == DIR_LEFT then
@@ -88,7 +88,7 @@ function refuel()
 				return REFUEL_ERROR
 			end
 		else
-			print("Refuel error: low on fuel and no extra fuel")
+			print("Refuel failed: low on fuel and no extra fuel")
 			return REFUEL_ERROR
 		end
 	else
@@ -114,7 +114,7 @@ while true do
 		turtle.transferTo(1, math.max(0,turtle.getItemCount(i)-1))
 	end
 	if direction == DIR_RIGHT then
-		while not refuel() == REFUEL_OK do
+		while not (refuel() == REFUEL_OK) do
 			sleep(SLEEP_REFUEL_FAIL)
 		end
 	end
