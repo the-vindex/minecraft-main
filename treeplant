@@ -1,11 +1,17 @@
+local SLEEP_BETWEEN_TURNS = 300
+local SLEEP_REFUEL_FAIL = 60
+
 local DIR_LEFT = "left"
 local DIR_RIGHT = "right"
 
 local direction = DIR_LEFT
 local ITEM_TO_PLANT = 1
+local ITEM_FUEL = 14
 local ITEM_TURN_AROUND_GUIDE = 15
 local ITEM_DIRECTION_GUIDE = 16
 
+local REFUEL_OK = 1
+local REFUEL_ERROR = 0
 
 function turnFinal()
 	if direction == DIR_LEFT then
@@ -68,6 +74,27 @@ function reverseDirection()
 	print("New direction"..direction)
 end
 
+
+--- return value: 1 - everything ok, 0 - not enough fuel
+function refuel()
+	if turtle.getFuelLevel() < 200 then
+		if turtle.getItemCount(ITEM_FUEL) > 1 then
+			turtle.select(ITEM_FUEL)
+			if turtle.refuel(math.max(0,turtle.getItemCount(ITEM_FUEL)-1)) then
+				return REFUEL_OK
+			else
+				return REFUEL_ERROR
+			end
+		else
+			return REFUEL_ERROR
+		end
+	else
+		return REFUEL_OK
+	end
+end
+
+-------------------------------------------
+
 while true do
 	turnToCorrectDirection()
 	while not detectTurn() do
@@ -78,10 +105,15 @@ while true do
 	end
 	reverseDirection()
 	print("Sleeping")
-	sleep(300)
-	for i=2,10 do
+	sleep(SLEEP_BETWEEN_TURNS)
+	for i=2,2 do
 		turtle.select(i)
-		turtle.transferTo(1)
+		turtle.transferTo(math.max(0,turtle.getItemCount(i)-1))
+	end
+	if direction == DIR_RIGHT then
+		while not refuel() == REFUEL_OK do
+			sleep(SLEEP_REFUEL_FAIL)
+		end
 	end
 end
 
