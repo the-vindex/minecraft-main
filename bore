@@ -1,1 +1,40 @@
-print("bore")
+local alwaysSuck = 0
+local ITEM_ENDERCHEST = 16
+
+---- Preconditions:
+-- Turtle is facing arcane bore HEAD, not padestal. Zero distance.
+-- Either ender chest with pickaxe is in slot 16 or this ender chest is already placed on top of turtle
+
+
+function dropFromSlot(slotNumber)
+	turtle.select(slotNumber)
+	turtle.drop(slotNumber)
+end
+
+-- place ender chest - initial setup only
+if turtle.getItemCount(ITEM_ENDERCHEST) > 0 then
+	turtle.select(ITEM_ENDERCHEST)
+	turtle.placeUp()
+end
+
+local bore = peripheral.wrap("front")
+if bore == nil then
+	print("Error, bore could not be wrapped")
+	exit(1)
+end
+
+
+if turtle.getItemCount(1) > 0 then
+	dropFromSlot(1)
+end
+
+if turtle.getItemCount(2) > 0 then
+	dropFromSlot(2)
+end
+
+if (bore.hasPickaxe() and bore.isPickaxeBroken()) or alwaysSuck then
+	turtle.select(1)
+	turtle.suck()
+	turtle.suck()
+	turtle.drop()
+end
