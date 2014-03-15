@@ -1,5 +1,7 @@
 local alwaysSuck = 0
 local ITEM_ENDERCHEST = 16
+local TURTLE_FOCUS_SLOT = 1
+local TURTLE_PICK_SLOT = 2
 
 ---- Preconditions:
 -- Turtle is facing arcane bore HEAD, not padestal. Zero distance.
@@ -11,6 +13,13 @@ function dropFromSlot(slotNumber)
 	turtle.drop(slotNumber)
 end
 
+function validateNotNill(value,errorMessage)
+	if value == nil then
+		print(errorMessage)
+		exit(1)
+	end
+end
+
 -- place ender chest - initial setup only
 if turtle.getItemCount(ITEM_ENDERCHEST) > 0 then
 	turtle.select(ITEM_ENDERCHEST)
@@ -18,23 +27,33 @@ if turtle.getItemCount(ITEM_ENDERCHEST) > 0 then
 end
 
 local bore = peripheral.wrap("front")
-if bore == nil then
-	print("Error, bore could not be wrapped")
-	exit(1)
+local chest = peripheral.wrap("top")
+validateNotNill(bore, "bore is nil")
+validateNotNill(chest, "chest is nil")
+
+
+if turtle.getItemCount(TURTLE_FOCUS_SLOT) > 0 then
+	dropFromSlot(TURTLE_FOCUS_SLOT)
 end
 
-
-if turtle.getItemCount(1) > 0 then
-	dropFromSlot(1)
-end
-
-if turtle.getItemCount(2) > 0 then
-	dropFromSlot(2)
+if turtle.getItemCount(TURTLE_PICK_SLOT) > 0 then
+	dropFromSlot(TURTLE_PICK_SLOT)
 end
 
 if (bore.hasPickaxe() and bore.isPickaxeBroken()) or alwaysSuck then
-	turtle.select(1)
+	turtle.select(TURTLE_FOCUS_SLOT)
 	turtle.suck()
+	turtle.select(TURTLE_PICK_SLOT)
 	turtle.suck()
-	turtle.drop()
+	dropFromSlot(TURTLE_FOCUS_SLOT)
+end
+
+if (not(bore.hasPickaxe)) then
+	for i=1..chest.getInventorySize() do
+		local slotContents = chest.getStackInSlot(i)
+		if (slotContents ~= nil and slotContents.id == 25329 and slotContents.dmg == 0) then
+			 chest.pushItemIntoSlot("down", i, 1, TURTLE_PICK_SLOT)
+			 dropFromSlot(TURTLE_PICK_SLOT)
+		end
+	end
 end
