@@ -1,3 +1,4 @@
+-- Syntax: manabeans cycleCount dump/resupply turnDirection(left,right,around,none) [continousDrop]
 local columnHeight = 100
 local currentSlot = 1
 local currentDirection = "up"
