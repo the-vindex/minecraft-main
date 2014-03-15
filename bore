@@ -51,11 +51,13 @@ if (bore.hasPickaxe() and bore.isPickaxeBroken()) or alwaysSuck then
 end
 
 if (not(bore.hasPickaxe)) then
+	print("Trying to find pick in chest")
 	for i=1,chest.getInventorySize() do
 		local slotContents = chest.getStackInSlot(i)
 		if (slotContents ~= nil and slotContents.id == 25329 and slotContents.dmg == 0) then
-			 chest.pushItemIntoSlot("down", i, 1, TURTLE_PICK_SLOT)
-			 dropFromSlot(TURTLE_PICK_SLOT)
+			print("Pick found")
+			chest.pushItemIntoSlot("down", i, 1, TURTLE_PICK_SLOT)
+			dropFromSlot(TURTLE_PICK_SLOT)
 		end
 	end
 end
