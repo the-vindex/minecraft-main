@@ -50,7 +50,7 @@ if (bore.hasPickaxe() and bore.isPickaxeBroken()) or alwaysSuck then
 	turtle.dropUp()
 end
 
-if (not(bore.hasPickaxe)) then
+if (not(bore.hasPickaxe())) then
 	print("Trying to find pick in chest")
 	for i=1,chest.getInventorySize() do
 		local slotContents = chest.getStackInSlot(i)
