@@ -46,6 +46,8 @@ if (bore.hasPickaxe() and bore.isPickaxeBroken()) or alwaysSuck then
 	turtle.select(TURTLE_PICK_SLOT)
 	turtle.suck()
 	dropFromSlot(TURTLE_FOCUS_SLOT)
+	turtle.select(TURTLE_PICK_SLOT)
+	turtle.dropUp()
 end
 
 if (not(bore.hasPickaxe)) then
