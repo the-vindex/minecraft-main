@@ -49,7 +49,7 @@ if (bore.hasPickaxe() and bore.isPickaxeBroken()) or alwaysSuck then
 end
 
 if (not(bore.hasPickaxe)) then
-	for i=1..chest.getInventorySize() do
+	for i=1,chest.getInventorySize() do
 		local slotContents = chest.getStackInSlot(i)
 		if (slotContents ~= nil and slotContents.id == 25329 and slotContents.dmg == 0) then
 			 chest.pushItemIntoSlot("down", i, 1, TURTLE_PICK_SLOT)
