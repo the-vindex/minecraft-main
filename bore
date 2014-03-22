@@ -58,6 +58,7 @@ if (not(bore.hasPickaxe())) then
 			print("Pick found")
 			chest.pushItemIntoSlot("down", i, 1, TURTLE_PICK_SLOT)
 			dropFromSlot(TURTLE_PICK_SLOT)
+			break
 		end
 	end
 end
