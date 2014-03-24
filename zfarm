@@ -91,7 +91,7 @@ function buildColumns(move)
 		for step = 1,portalCount+1 do
 			place("down")
 			place("up")
-			if step == length then
+			if step == portalCount+1 then
 				autoTurn()
 			end
 			move()
