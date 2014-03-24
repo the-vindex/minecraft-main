@@ -1,1 +1,46 @@
 -- Zombie pigman farm using portals
+local portalCount = 3
+local length = 1 + 3*portalCount
+local turnDir = "left"
+
+function forward(count)
+	if count == nil then
+		count = 1
+	end
+	for i = 1,count do
+		turtle.forward()
+	end
+end
+
+function changeTurnDir()
+	if turnDir == "left" then
+		turnDir = "right"
+	else if turnDir == "right" then
+		turnDir = "left"
+	else
+		print("Unknown turn dir")
+		exit(1)
+	end
+end
+
+function autoTurn()
+	if turnDir == "left" then
+		turtle.turnLeft()
+	else if turnDir == "right" then
+		turtle.turnRight()
+	else
+		print("Unknown turn dir")
+		exit(1)
+	end
+end
+
+for i = 1,portalCount+1 do
+	for step = 1,length do
+		turtle.placeDown()
+		forward()
+	end
+	autoTurn()
+	turtle.forward(3)
+	autoTurn()
+	changeTurnDir()
+end
