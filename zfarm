@@ -18,6 +18,15 @@ function forward(count)
 	end
 end
 
+function back(count)
+	if count == nil then
+		count = 1
+	end
+	for i = 1,count do
+		turtle.back()
+	end
+end
+
 function changeTurnDir()
 	if turnDir == "left" then
 		turnDir = "right"
@@ -59,7 +68,7 @@ function selectSlot(num)
 	currentSlot=num
 end
 
-function buildGrid()
+function buildRows()
 	for i = 1,portalCount+1 do
 		for step = 1,length do
 			place("down")
@@ -77,8 +86,33 @@ function buildGrid()
 	end
 end
 
+function buildColumns(move)
+	for i = 1,portalCount+1 do
+		for step = 1,portalCount+1 do
+			place("down")
+			place("up")
+			if step == length then
+				autoTurn()
+			end
+			move()
+			place()
+		end
+
+		if i < portalCount+1 then
+			autoTurn()
+			move(2)
+			autoTurn()
+			changeTurnDir()
+		end
+	end
+end
+
 selectSlot(1)
-buildGrid()
+buildRows()
 changeTurnDir()
 autoTurn()
-buildGrid()
+buildRows()
+
+autoTurn()
+changeTurnDir()
+buildColumns(back)
