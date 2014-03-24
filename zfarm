@@ -34,13 +34,23 @@ function autoTurn()
 	end
 end
 
-for i = 1,portalCount+1 do
-	for step = 1,length do
-		turtle.placeDown()
-		forward()
+function buildGrid()
+	for i = 1,portalCount+1 do
+		for step = 1,length do
+			turtle.placeDown()
+			forward()
+		end
+
+		if i < portalCount+1 then
+			autoTurn()
+			forward(3)
+			autoTurn()
+			changeTurnDir()
+		end
 	end
-	autoTurn()
-	turtle.forward(3)
-	autoTurn()
-	changeTurnDir()
 end
+
+buildGrid()
+changeTurnDir()
+autoTurn()
+buildGrid()
