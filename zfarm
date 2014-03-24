@@ -77,7 +77,7 @@ function buildGrid()
 	end
 end
 
-turtle.select(1)
+selectSlot(1)
 buildGrid()
 changeTurnDir()
 autoTurn()
