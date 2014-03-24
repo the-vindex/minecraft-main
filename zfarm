@@ -15,7 +15,7 @@ end
 function changeTurnDir()
 	if turnDir == "left" then
 		turnDir = "right"
-	else if turnDir == "right" then
+	elseif turnDir == "right" then
 		turnDir = "left"
 	else
 		print("Unknown turn dir")
@@ -26,7 +26,7 @@ end
 function autoTurn()
 	if turnDir == "left" then
 		turtle.turnLeft()
-	else if turnDir == "right" then
+	elseif turnDir == "right" then
 		turtle.turnRight()
 	else
 		print("Unknown turn dir")
