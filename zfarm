@@ -96,23 +96,23 @@ function buildColumns(move)
 			end
 			move()
 			place()
+			move(2)
 		end
 
 		if i < portalCount+1 then
-			autoTurn()
 			move(2)
-			autoTurn()
+			autoTurn()			
 			changeTurnDir()
 		end
 	end
 end
 
-selectSlot(1)
-buildRows()
-changeTurnDir()
-autoTurn()
-buildRows()
+--selectSlot(1)
+--buildRows()
+--changeTurnDir()
+--autoTurn()
+--buildRows()
 
-autoTurn()
+--autoTurn()
 changeTurnDir()
 buildColumns(back)
