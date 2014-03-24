@@ -107,7 +107,7 @@ function buildColumns(move)
 	end
 end
 
---selectSlot(1)
+selectSlot(1)
 --buildRows()
 --changeTurnDir()
 --autoTurn()
