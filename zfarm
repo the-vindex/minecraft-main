@@ -38,7 +38,9 @@ function buildGrid()
 	for i = 1,portalCount+1 do
 		for step = 1,length do
 			turtle.placeDown()
-			forward()
+			if step < length then
+				forward()
+			end
 		end
 
 		if i < portalCount+1 then
@@ -50,6 +52,7 @@ function buildGrid()
 	end
 end
 
+turtle.select(1)
 buildGrid()
 changeTurnDir()
 autoTurn()
