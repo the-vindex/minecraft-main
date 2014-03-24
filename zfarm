@@ -110,11 +110,25 @@ function buildColumns(move)
 end
 
 selectSlot(1)
---buildRows()
---changeTurnDir()
---autoTurn()
---buildRows()
+buildRows()
+changeTurnDir()
+autoTurn()
+buildRows()
 
---autoTurn()
+turtle.up()
+
+autoTurn()
 changeTurnDir()
 buildColumns(back)
+
+turtle.up()
+turtle.up()
+turtle.up()
+forward()
+turtle.turnRight()
+turnDir="left"
+
+buildRows()
+changeTurnDir()
+autoTurn()
+buildRows()
