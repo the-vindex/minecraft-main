@@ -1,0 +1,58 @@
+rednet.open("right")
+local c = peripheral.wrap("bottom")
+local a = peripheral.wrap("front")
+local f = peripheral.wrap("top")
+local redstoneDir = "back"
+--Added this incase you are pastebinning the code
+local beans = {}
+
+function scanSlot(slot)
+    c.pushItem("up", slot,1)
+    turtle.drop()
+    data = a.getAspects()
+    beans[data] = slot
+    turtle.suck()
+    c.pullItemIntoSlot("up", 1, 1,slot)
+end   
+
+function scanSlots()
+   redstone.setOutput(redstoneDir, true)
+   for i = 1, 55 do
+      if c.getStackInSlot(i) then
+         scanSlot(i)
+      end
+   end
+   redstone.setOutput(redstoneDir, false)
+end
+
+function essentia(aspect, numAspect)
+   if not f.getStackInSlot(1) then
+      c.pushItemIntoSlot("up", beans[aspect], numAspect,1)
+      redstone.setOutput("left", true)
+      sleep(1)
+      redstone.setOutput("left", false)
+      sleep(3)
+      --f.pullItemIntoSlot("down", 1, numAspect,1)   
+   end
+   while f.getStackInSlot(1) do
+      print("Waiting for empty furnace....")
+      sleep(3)
+   end
+--   sleep(15)
+end
+
+function awaitRednet()
+  local id, msg, dist = rednet.receive()
+--  term.write(msg) 
+  local essData = {}
+  essData = textutils.unserialize(msg)
+  print(essData[1]..":"..essData[2])
+  essentia(essData[1], essData[2])
+  rednet.send(id, "Complete")
+end
+
+scanSlots()
+while true do
+   awaitRednet()
+end
+--essentia("lucrum", 1)

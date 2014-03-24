@@ -1,0 +1,167 @@
+rednet.open("left")
+os.loadAPI("button")
+local turtleID = 1679
+local essentia = {}
+local jars = peripheral.getNames()
+local m = peripheral.wrap("top")
+local monCoord = {}
+local currEssentia
+local fillAmt = 0
+local rowsActive = true
+
+function sortEss(t)
+   local keys = {}
+   for k in pairs(t) do keys[#keys+1] = k end
+   table.sort(keys)
+   
+   local i = 0
+   return function()
+      i = i+1
+      if keys[i] then
+         return keys[i], t[keys[i]]
+      end
+   end
+end
+
+function scanEssentia()
+  essentia = {}
+  for i,j in ipairs(jars) do
+     if peripheral.getType(j) == "tt_aspectContainer" then
+       asp = peripheral.call(j, "getAspects")
+       countasp = peripheral.call(j, "getAspectCount", asp)
+       if countasp > 0 then
+		  if essentia[asp] == nil then
+			essentia[asp] = 0
+		  end
+          essentia[asp] = essentia[asp] + math.floor(countasp)
+       end
+--       print(countasp)
+--     print(asp..":"..countasp)
+--     print(peripheral.getType(j))
+     end
+  end
+end
+
+function printEssentia()
+  m.setTextColor(colors.white)
+  local x = 1
+  local y = 1
+  monCoord[x] = {}
+--  for a = 1,17 do
+  for i,j in sortEss(essentia) do
+     if j<=20 then m.setTextColor(colors.red) end
+     if j<40 and j>20 then m.setTextColor(colors.yellow) end
+     if j>=40 then m.setTextColor(colors.green) end
+     
+     m.setCursorPos(x,y)
+     m.write(i)
+     m.setCursorPos(x+14,y)
+     m.write(tostring(j))
+--     print(j)
+     monCoord[x][y] = i
+     if y < 17 then
+        y = y+1
+     else
+        y = 1
+        x = x+17
+        monCoord[x] = {}   
+     end
+  end
+-- end
+ m.setTextColor(colors.white)
+end
+
+function getClick()
+   local event,side,x,y = os.pullEvent()
+   if event=="monitor_touch" then
+     if button.checkxy(x,y) then
+        print("button")
+     else
+        if rowsActive then
+          fillAmt = 0
+          print(x..":"..x-(x%17)+1)
+          print(monCoord[x-(x%17)+1][y])
+          currEssentia = monCoord[x-(x%17)+1][y]
+          if currEssentia ~= nil then
+          if essentia[currEssentia] < 64 then
+             fillTable2()
+          else
+             m.clear()
+             button.label(1,10, currEssentia.." is already full.  Please choose another.")
+             sleep(3)
+             refresh()
+          end
+          end
+        end
+     end
+   end
+end
+
+function refresh()
+   button.flash("Refresh")
+   m.clear()
+   scanEssentia()
+   printEssentia()
+   print("Refreshed")
+   button.screen()
+end
+
+function fillTable()
+   rowsActive = true
+   button.clearTable()
+   button.setTable("Refresh", refresh, "", 15, 35, 19, 19)
+   button.screen()
+end
+
+function addEss(num)
+   fillAmt = fillAmt + num
+   if fillAmt < 0 then fillAmt = 0 end
+   if fillAmt > 64-essentia[currEssentia] then fillAmt = 64-essentia[currEssentia] end
+   m.clear()
+   fillTable2()
+end
+
+function fillEss()
+   local essData = {}
+   essData[1] = currEssentia
+   essData[2] = fillAmt
+   local sendData = ""
+   sendData = textutils.serialize(essData)
+   rednet.send(turtleID, sendData)
+   m.clear()
+   button.label(7, 10, "Waiting for aspects to finish cooking....")
+   button.label(7, 12, "Don't forget to refresh the screen after")
+   button.label(7, 13, "the golem is done moving the essentia.")
+   rednet.receive()
+   m.clear()
+   fillTable()
+   refresh()
+end
+
+function cancel()
+   m.clear()
+   fillTable()
+   refresh()
+end   
+
+function fillTable2()
+   rowsActive = false
+   button.clearTable()
+   m.clear()
+   button.label(7, 1, "Essentia: "..currEssentia.." contains "..essentia[currEssentia])
+   button.setTable("+1", addEss, 1, 8, 18, 6,6)
+   button.setTable("+5", addEss, 5, 20, 30, 6, 6)
+   button.setTable("+10", addEss, 10, 32, 42, 6, 6)
+   button.setTable("-1", addEss, -1, 8, 18, 8, 8)
+   button.setTable("-5", addEss, -5, 20, 30, 8, 8)
+   button.setTable("-10", addEss, -10, 32, 42, 8 ,8)
+   button.setTable("Refill Jar", addEss, 64-essentia[currEssentia], 8, 42, 10, 10)
+   button.setTable("Execute Fill Request", fillEss, "", 8, 42, 16, 18)
+   button.setTable("Cancel", cancel, "", 20, 30, 12, 14)
+   button.label(7, 4, "Currently Adding "..fillAmt.." "..currEssentia.." essentia.")
+   button.screen()
+end
+
+fillTable()
+refresh()
+while true do getClick() end
