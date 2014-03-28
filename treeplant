@@ -1,3 +1,4 @@
+--- Turtle which can plant tree saplings. Orients itself using line of cobble (item in Direction Guide) and plans (Turn around guide)
 local SLEEP_BETWEEN_TURNS = 300
 local SLEEP_REFUEL_FAIL = 60
 

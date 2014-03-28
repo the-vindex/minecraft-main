@@ -2,6 +2,8 @@ local ITEM_ENDERCHEST = 16
 local TURTLE_FOCUS_SLOT = 1
 local TURTLE_PICK_SLOT = 2
 
+--- Turtle for Arcane Bore - takes out broken pick and replaces it with a fresh pick from the chest above it.
+--- Can place this chest (should be ender then)
 ---- Preconditions:
 -- Turtle is facing arcane bore HEAD, not padestal. Zero distance.
 -- Either ender chest with pickaxe is in slot 16 or this ender chest is already placed on top of turtle

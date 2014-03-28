@@ -1,3 +1,4 @@
+-- original DW20 program for turtle burning manabeans
 rednet.open("right")
 local c = peripheral.wrap("bottom")
 local a = peripheral.wrap("front")
