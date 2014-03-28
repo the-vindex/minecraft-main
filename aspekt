@@ -28,18 +28,21 @@ function scanEssentia()
   essentia = {}
   for i,j in ipairs(jars) do
      if peripheral.getType(j) == "tt_aspectContainer" then
-       asp = peripheral.call(j, "getAspects")
-       countasp = peripheral.call(j, "getAspectCount", asp)
-	   if countasp == nil then countasp = 0 end
+       local asp = peripheral.call(j, "getAspects")
 	   
-       if countasp > 0 then
-		  if essentia[asp] == nil then
-			essentia[asp] = 0
-		  end
-          essentia[asp] = essentia[asp] + math.floor(countasp)
-       end
---       print(countasp)
-     print(asp..":"..countasp)
+	   if asp ~= nil then
+		   local countasp = peripheral.call(j, "getAspectCount", asp)
+		   if countasp == nil then countasp = 0 end
+		   
+		   if countasp > 0 then
+			  if essentia[asp] == nil then
+				essentia[asp] = 0
+			  end
+			  essentia[asp] = essentia[asp] + math.floor(countasp)
+		   end
+	--       print(countasp)
+		   print(asp..":"..countasp)
+	   end
 --     print(peripheral.getType(j))
      end
   end
