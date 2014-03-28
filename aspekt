@@ -37,7 +37,7 @@ function scanEssentia()
           essentia[asp] = essentia[asp] + math.floor(countasp)
        end
 --       print(countasp)
---     print(asp..":"..countasp)
+     print(asp..":"..countasp)
 --     print(peripheral.getType(j))
      end
   end
