@@ -162,6 +162,11 @@ function fillTable2()
    button.screen()
 end
 
+if m == nil then
+	print("Error, monitor not wrapped!")
+	exit(1)
+end
+
 fillTable()
 refresh()
 while true do getClick() end
