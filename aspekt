@@ -1,4 +1,4 @@
-rednet.open("left")
+rednet.open("top")
 os.loadAPI("button")
 local turtleID = 185
 local essentia = {}
