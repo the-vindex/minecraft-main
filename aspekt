@@ -30,6 +30,8 @@ function scanEssentia()
      if peripheral.getType(j) == "tt_aspectContainer" then
        asp = peripheral.call(j, "getAspects")
        countasp = peripheral.call(j, "getAspectCount", asp)
+	   if countasp == nil then countasp = 0 end
+	   
        if countasp > 0 then
 		  if essentia[asp] == nil then
 			essentia[asp] = 0
