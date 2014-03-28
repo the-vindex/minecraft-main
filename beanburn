@@ -1,0 +1,91 @@
+--Make sure there is an inventory above the turtle that can hold one of each mana bean you have.
+ 
+--Mana Bean item ID
+local manaBeanId =25366
+
+rednet.open("right")
+ 
+--Request Logistics Pipe
+local req=peripheral.wrap("bottom")
+ 
+--Achemical Furnace
+local f=peripheral.wrap("front")
+ 
+--table that holds the item identifier to aspect relations
+local beans={}
+
+function initializeTurtle()
+   turtle.select(1)
+  req.setTurtleConnect(true)
+end
+
+function initializeBeans()	
+	local aspectNameToUid = {}
+
+	local items = req.getAvailableItems()
+	for k,v in pairs(items) do
+		local itemUid = v[1]
+		local id=req.getItemID(itemUid)
+		if manaBeanId==id then -- check item ID if it's manabean
+			local nbt = req.getNBTTagCompound(itemUid)
+			local nbtValues = nbt["value"]
+			local aspects = nbtValues["Aspects"]
+			local aspectsValue = aspects["value"][1]["value"]["key"]
+			local aspectName = aspectsValue["value"]
+			aspectNameToUid[aspectName] = itemUid
+		end
+	end
+	return aspectNameToUid
+end
+
+
+function getItemCount()
+  local sum=0
+  for s=1,16 do
+    sum=sum+turtle.getItemCount(s)
+  end
+  return sum
+end
+
+function requestBeans(aspect,qty)
+  avail=req.getItemAmount(beans[aspect])
+  print("available:"..avail)
+  print("qty:"..qty)
+  if avail<qty then
+    qty=avail
+  end
+  req.makeRequest(beans[aspect],qty)
+  while getItemCount()<qty do
+    print("Waiting for beans")
+    sleep(.5)
+  end
+end
+
+
+function essentia(aspect, numAspect)
+  if not f.getStackInSlot(1) then
+     requestBeans(aspect,numAspect)
+     turtle.drop()
+   end
+   while f.getStackInSlot(1) do
+      print("Waiting for empty furnace....")
+      sleep(3)
+   end
+end
+ 
+function awaitRednet()
+  local id, msg, dist = rednet.receive()
+  term.write(msg)
+  local essData = {}
+  essData = textutils.unserialize(msg)
+  print(essData[1]..":"..essData[2])
+  essentia(essData[1], tonumber(essData[2]))
+  rednet.send(id, "Complete")
+end
+
+initializeTurtle()
+beans=initializeBeans()
+
+while true do
+   awaitRednet()
+end
