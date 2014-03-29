@@ -1,0 +1,213 @@
+local padestals
+local PADESTALS_ORDER_FILE = "padestals.dat"
+local m = peripheral.wrap("right")
+
+function table.getSingleKey(tab)
+	if table.size(tab) ~= 1 then error("This method expects exactly 1 key in the table, was "..#tab) end
+	
+	for key in pairs(tab) do
+		return key
+	end
+end
+
+function removeFromArray(array, object)
+	if array == nil then error("Array is nil") end
+	local keyToRemove
+	repeat
+		keyToRemove = nil
+		for key, value in pairs(array) do
+			if value == object then
+				keyToRemove = key
+				break
+			end
+		end
+		table.remove(array, keyToRemove)
+	until keyToRemove ~= nil
+end
+
+function table.size(t)
+	local count = 0
+	for _ in pairs(t) do
+		count = count + 1
+	end
+	return count
+end
+
+function shallowCopy(orig)
+    local orig_type = type(orig)
+    local copy
+    if orig_type == 'table' then
+        copy = {}
+        for orig_key, orig_value in pairs(orig) do
+            copy[orig_key] = orig_value
+        end
+    else -- number, string, boolean, etc
+        copy = orig
+    end
+    return copy
+end
+
+function table.arrayToSet(array)
+	local set = {}
+	for k, v in pairs(array) do
+		set[v] = 1
+	end
+	return set
+end
+
+function listMethods(o)
+	local count = 0
+	for i,v in pairs(o) do
+		print(i)
+		count = count + 1
+		if count >= 7 then
+			local res = io.read()
+			if res == "q" then
+				return
+			end
+			count = 0
+		end
+	end
+
+end
+
+function listValues(o)
+	local count = 0
+	for i,v in pairs(o) do
+		print(v)
+		count = count + 1
+		if count >= 7 then
+			local res = io.read()
+			if res == "q" then
+				return
+			end
+			count = 0
+		end
+	end
+end
+
+-- nacte seznam ender chest pod padestaly
+function listPadestals()
+	local padestals = {}
+	local peripheralSides = peripheral.getNames()
+	for _, side in pairs(peripheralSides) do
+		if peripheral.getType(side) == 'ender_chest' then
+			table.insert(padestals, side)
+		end
+	end
+	
+	return padestals
+end
+
+function withPeripheralsDo(peripheralSides,fun)
+	local collect = {}
+	for _, side in pairs(peripheralSides) do
+		local result = fun(side)
+		if result ~= nil then 
+			collect[side] = result
+		end
+	end
+	return collect
+end
+
+function opStack_getSize(stack)
+	if stack == nil then
+		return 0
+	end
+	
+	return stack.qty
+end
+
+function chestOperation_detectItemInPadestal(side) 
+	--print('Processing side'..side)
+	local chest = peripheral.wrap(side)
+	chest.condenseItems()
+	local countSlot27 = opStack_getSize(chest.getStackInSlot(27))
+	if countSlot27 > 0 then
+		error("Slot 27 in ender chest is not empty...")
+	end
+	chest.pullItem('up',1,1,27)
+	countSlot27 = opStack_getSize(chest.getStackInSlot(27))
+	if countSlot27 > 0 then
+		return 1
+	else
+		return nil
+	end
+end
+
+function saveTable(t,name)
+	local file = fs.open(name,"w")
+	file.write(textutils.serialize(t))
+	file.close()
+end
+
+function loadTable(name)
+	local file = fs.open(name,"r")
+	local data = file.readAll()
+	file.close()
+	return textutils.unserialize(data)
+end
+
+
+function _orderPadestals()
+	local notOrderedPadestals = shallowCopy(padestals)
+	local limit = 5000
+	local padestalOrder = {}
+	while #padestalOrder < #padestals and limit > 0 do
+		local padestalsWithItems = withPeripheralsDo(notOrderedPadestals,chestOperation_detectItemInPadestal)
+		print("Padestals found:")
+		listMethods(padestalsWithItems)
+		if table.size(padestalsWithItems) > 1 then
+			print("Error: Item was detected in 2 padestals at the same time. Ignoring this attempt!") 
+		elseif table.size(padestalsWithItems) == 1 then
+			local identifiedPadestal = table.getSingleKey(padestalsWithItems)
+			table.insert(padestalOrder, identifiedPadestal)
+			removeFromArray(notOrderedPadestals, identifiedPadestal)
+			print("Identified "..identifiedPadestal)
+		end
+		limit = limit - 1
+	end
+	return padestalOrder
+end
+
+function initializePadestalOrder(padestals)
+	local padestalOrder
+	local savedPadestalsInvalid = false
+	if fs.exists(PADESTALS_ORDER_FILE) then
+		local loadedOrder = loadTable(PADESTALS_ORDER_FILE)
+		--verify all padestals computer has are in order file and vise versa
+		local computerPadestalsSet = table.arrayToSet(padestals)
+		local loadedPadestalsSet = table.arrayToSet(loadedOrder)
+		local computerPadestalsNotInLoaded = false
+		local loadedPadestalsNotInComputer = false
+		for key in pairs(computerPadestalsSet) do
+			if loadedPadestalsSet[key] == nil then
+				computerPadestalsNotInLoaded = true
+			end
+		end
+		for key in pairs(loadedPadestalsSet) do
+			if computerPadestalsSet[key] == nil then
+				loadedPadestalsNotInComputer = true
+			end
+		end
+		
+		if computerPadestalsNotInLoaded or loadedPadestalsNotInComputer then
+			padestalOrder = nil
+			savedPadestalsInvalid = true
+		else
+			padestalOrder = loadedOrder
+		end
+	end
+	
+	if padestalOrder == nil then
+		if savedPadestalsInvalid then
+			print("Warning: padestals saved in the file are no longer matching padestals of the computer. Reinitialization needed.")
+		end
+		print("Padestal order initialization - put dirt onto padestals in order, which will imply symetry of padestals. This order will be stored in computer and will be loaded next time. Before putting next item onto padestal wait for previous item to disappear")
+		padestalOrder = _orderPadestals()
+		saveTable(padestalOrder, PADESTALS_ORDER_FILE)
+	end
+end
+
+padestals = listPadestals()
+padestalOrder = initializePadestalOrder(padestals)

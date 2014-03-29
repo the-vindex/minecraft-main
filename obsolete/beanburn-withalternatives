@@ -1,0 +1,176 @@
+--Make sure there is an inventory above the turtle that can hold one of each mana bean you have.
+ 
+--Mana Bean item ID
+local manaBeanId =25366
+
+rednet.open("right")
+ 
+--Request Logistics Pipe
+local req=peripheral.wrap("bottom")
+ 
+--Achemical Furnace
+local f=peripheral.wrap("front")
+ 
+--table that holds the item identifier to aspect relations
+local beans={}
+local alter={}
+
+local alterDef = {}
+
+--print (1)
+function aspsrc(item,amount)
+	return {item=item,amount=amount}
+end
+
+function item(id,dmg)
+	local it = {}
+	it["id"] = id
+	it["dmg"] = dmg
+	return it
+end
+
+function initializeTurtle()
+   turtle.select(1)
+  req.setTurtleConnect(true)
+end
+
+function initializeBeans()	
+	local aspectNameToUid = {}
+
+	local items = req.getAvailableItems()
+	for k,v in pairs(items) do
+		local itemUid = v[1]
+		local id=req.getItemID(itemUid)
+		if manaBeanId==id then -- check item ID if it's manabean
+			local nbt = req.getNBTTagCompound(itemUid)
+			local nbtValues = nbt["value"]
+			local aspects = nbtValues["Aspects"]
+			local aspectsValue = aspects["value"][1]["value"]["key"]
+			local aspectName = aspectsValue["value"]
+			aspectNameToUid[aspectName] = itemUid
+		end
+	end
+	return aspectNameToUid
+end
+
+--prepare UIDs for items, which can be burnt for essentia
+function initializeAlternatives()
+	local aspectNameToUid = {}
+	for aspectName,aspectSource in pairs(alterDef) do
+		--print(3)
+		local id=aspectSource['item']['id']
+		--print(3.1)
+		local dmg=aspectSource['item']['dmg']
+		--print(3.2)
+		if dmg == nil then dmg = 0 end
+		--print(id,":",dmg)
+		local uid = req.getItemIdentifierIDFor(id,dmg)
+		--print(4)
+		if uid ~= nil then
+			aspectNameToUid[aspectName] = aspsrc(uid,aspectSource['amount'])
+		end
+	end
+	return aspectNameToUid
+end
+
+function getItemCount()
+  local sum=0
+  for s=1,16 do
+    sum=sum+turtle.getItemCount(s)
+  end
+  return sum
+end
+
+function requestAlternative(aspect,qty)
+	if alter[aspect] == nil then 
+		--print("No alternative for "..aspect)
+		return 0 
+	end
+	
+	local uid = alter[aspect]['item']
+	if uid == nil then return 0 end
+	
+	local aspectPerItem = alter[aspect]['amount']
+	
+	local qtyToRequest = math.floor(qty/aspectPerItem)
+	--print(8.1)
+	local received = requestItem(uid,qtyToRequest)
+	--print(8.2)
+	return received*aspectPerItem
+end
+
+function requestBeans(aspect,qty)
+	return requestItem(beans[aspect],qty)
+end
+
+-- request certain item in specific quantity
+-- returns amount of item really received
+function requestItem(uid,qty)
+	--print(9.1)
+  local avail=req.getItemAmount(uid)
+  --print(9.2)
+  --print("available:"..avail)
+  --print("qty:"..qty)
+  if avail<qty then
+    qty=avail
+  end
+  --print(9.3)
+  req.makeRequest(uid,qty)
+  --print(9.4)
+  while getItemCount()<qty do
+    --print("Waiting for beans")
+    sleep(.5)
+  end
+  return qty
+end
+
+function essentia(aspect, numAspect)
+	if not f.getStackInSlot(1) then
+		--print(7.1)
+		local alternativeAspectProvided = requestAlternative(aspect, numAspect)
+		--print(7.2)
+		if alternativeAspectProvided > 0 then
+			--print(7.3)
+			turtle.drop()
+			waitForEmptyFurnace()
+			--print(7.4)
+		end
+		--print(7.5)
+		numAspect = numAspect - alternativeAspectProvided
+		
+		if numAspect > 0 then
+			--print(7.6)
+			requestBeans(aspect,numAspect)
+			turtle.drop()
+		end
+	end
+	waitForEmptyFurnace()
+end
+
+function waitForEmptyFurnace()
+   while f.getStackInSlot(1) do
+      --print("Waiting for empty furnace....")
+      sleep(3)
+   end
+end
+ 
+function awaitRednet()
+  local id, msg, dist = rednet.receive()
+  term.write(msg)
+  local essData = {}
+  essData = textutils.unserialize(msg)
+  --print(essData[1]..":"..essData[2])
+  essentia(tostring(essData[1]), tonumber(essData[2]))
+  rednet.send(id, "Complete")
+end
+
+alterDef['praecantio'] = aspsrc(item(372),1)
+initializeTurtle()
+beans=initializeBeans()
+
+alter=initializeAlternatives()
+
+--print (6)
+while true do
+   awaitRednet()
+end
