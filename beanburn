@@ -16,7 +16,6 @@ local beans={}
 local alter={}
 
 local alterDef = {}
-alterDef['praecantio'] = aspsrc(item(372),1)
 
 function aspsrc(item,amount)
 	return {item=item,amount=amount}
@@ -143,6 +142,8 @@ function awaitRednet()
   essentia(essData[1], tonumber(essData[2]))
   rednet.send(id, "Complete")
 end
+
+alterDef['praecantio'] = aspsrc(item(372),1)
 
 initializeTurtle()
 beans=initializeBeans()
