@@ -57,7 +57,7 @@ function initializeAlternatives()
 	local aspectNameToUid = {}
 
 	for aspectName,aspectSource in pairs(alterDef) do
-		local uid = req.getItemIdentifierFor(aspectSource['item']['id'],aspectSource['item']['dmg'])
+		local uid = req.getItemIdentifierIDFor(aspectSource['item']['id'],aspectSource['item']['dmg'])
 		if uid ~= nil then
 			aspectNameToUid['aspectName'] = aspsrc(uid,aspectSource['amount'])
 		end
