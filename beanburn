@@ -13,6 +13,21 @@ local f=peripheral.wrap("front")
  
 --table that holds the item identifier to aspect relations
 local beans={}
+local alter={}
+
+local alterDef = {}
+alterDef['praecantio'] = aspsrc(item(372),1)
+
+function aspsrc(item,amount)
+	return {item=item,amount=amount}
+end
+
+function item(id,dmg)
+	local it = {}
+	it["id"] = id
+	it["dmg"] = dmg
+	return it
+end
 
 function initializeTurtle()
    turtle.select(1)
@@ -38,6 +53,18 @@ function initializeBeans()
 	return aspectNameToUid
 end
 
+--prepare UIDs for items, which can be burnt for essentia
+function initializeAlternatives()
+	local aspectNameToUid = {}
+
+	for aspectName,aspectSource in pairs(alterDef) do
+		local uid = req.getItemIdentifierFor(aspectSource['item']['id'],aspectSource['item']['dmg']))
+		if uid ~= nil then
+			aspectNameToUid['aspectName'] = aspsrc(uid,aspectSource['amount'])
+		end
+	end
+	return aspectNameToUid
+end
 
 function getItemCount()
   local sum=0
@@ -47,8 +74,27 @@ function getItemCount()
   return sum
 end
 
+function requestAlternative(aspect,qty)
+	local uid = alter[aspect]['item']
+	if uid == nil then return 0 end
+	
+	local aspectPerItem = alter[aspect]['amount']
+	
+	local qtyToRequest = math.floor(qty/aspectPerItem)
+	
+	local received = requestItem(beans[aspect],qtyToRequest)
+	
+	return received*aspectPerItem
+end
+
 function requestBeans(aspect,qty)
-  avail=req.getItemAmount(beans[aspect])
+	return requestItem(beans[aspect],qty)
+end
+
+-- request certain item in specific quantity
+-- returns amount of item really received
+function requestItem(uid,qty)
+  local avail=req.getItemAmount(uid)
   print("available:"..avail)
   print("qty:"..qty)
   if avail<qty then
@@ -59,14 +105,29 @@ function requestBeans(aspect,qty)
     print("Waiting for beans")
     sleep(.5)
   end
+  return qty
 end
 
-
 function essentia(aspect, numAspect)
-  if not f.getStackInSlot(1) then
-     requestBeans(aspect,numAspect)
-     turtle.drop()
-   end
+	if not f.getStackInSlot(1) then
+  
+		local alternativeAspectProvided = requestAlternative(aspect, numAspect)
+		if alternativeAspectProvided > 0 then
+			turtle.drop()
+			waitForEmptyFurnace()
+		end
+	  
+		numAspect = numAspect - alternativeAspectProvided
+		
+		if numAspect > 0 then
+			requestBeans(aspect,numAspect)
+			turtle.drop()
+		end
+	end
+	waitForEmptyFurnace()
+end
+
+function waitForEmptyFurnace()
    while f.getStackInSlot(1) do
       print("Waiting for empty furnace....")
       sleep(3)
@@ -85,6 +146,7 @@ end
 
 initializeTurtle()
 beans=initializeBeans()
+alter=initializeAlternatives()
 
 while true do
    awaitRednet()
