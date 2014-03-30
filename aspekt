@@ -28,7 +28,7 @@ function getAspectCount(peripheralName, peripheralType, aspectInfo)
    local aspectName
    local countasp 
    if peripheralType == "tt_aspectContainer" then
-		countasp = peripheral.call(peripheralName, "getAspectCount", asp)
+		countasp = peripheral.call(peripheralName, "getAspectCount", aspectInfo)
 		if countasp == nil then countasp = 0 end
 		aspectName = aspectInfo
    elseif peripheralType == "tilejarvoid" then
