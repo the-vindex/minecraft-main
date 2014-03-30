@@ -131,11 +131,14 @@ function getClick()
 end
 
 function autofillEssentia()
+	print("Autorefill started")
 	for aspectName, quantity in pairs(essentia) do
 		if quantity < AUTO_FILL_QUANTITY then
+			print("Found insufficient "..aspectName)
 			currEssentia = aspectName
 			fillAmt = AUTO_FILL_QUANTITY - quantity
 			fillEss()
+			break
 		end
 	end
 end
@@ -238,7 +241,7 @@ function initializeTurtleId()
 		saveTable(settings, SETTINGS_FILE)
 		print("Settings for this program are stored in aspekt.cfg")
 	end
-	return settings.turtleID
+	return tonumber(settings.turtleID)
 end
 
 if m == nil then
