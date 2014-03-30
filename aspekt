@@ -3,7 +3,7 @@
 ---- Supply "remoteAspectMonitor" argument on command line
 
 rednet.open("top")
-local AUTO_FILL_QUANTITY = 50
+local AUTO_FILL_QUANTITY = 64
 local FILL_LIMIT = 64
 local SETTINGS_FILE = "aspekt.cfg"
 local turtleID -- dynamically discovered using wireless modem
