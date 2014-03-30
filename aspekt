@@ -1,10 +1,13 @@
 ----- Modified DW20 program which displays amount of essentia in jars
+-- Also used in secondary mode for remote aspect monitoring - used for alembics monitoring.
+---- Supply "remoteAspectMonitor" argument on command line
+
 rednet.open("top")
-os.loadAPI("button")
 local AUTO_FILL_QUANTITY = 50
 local FILL_LIMIT = 64
 local SETTINGS_FILE = "aspekt.cfg"
-local turtleID -- filled from settings file above
+local turtleID -- dynamically discovered using wireless modem
+local remoteAspectMonitorId -- dynamically discovered using wireless modem
 local essentia = {}
 local jars = peripheral.getNames()
 local m = peripheral.wrap("right")
@@ -242,27 +245,28 @@ function loadTable(name)
 	return textutils.unserialize(data)
 end
 
-function initializeTurtleId()
+function initializeSettings()
 	local settings
 	if fs.exists(SETTINGS_FILE) then
 		settings = loadTable(SETTINGS_FILE)
-		if settings == nil or settings.turtleID == nil then
+		if settings == nil or type(settings) ~= "table" then
 			fs.delete(SETTINGS_FILE)
 			settings = nil
 		end
 	end
 	if settings == nil then
-		local turtleID
-		repeat
-			io.write("Input turtle ID for burning mana beans:")
-			turtleID = io.read()
-		until tonumber(turtleID) ~= nil
+--		local turtleID
+--		repeat
+--			io.write("Input turtle ID for burning mana beans:")
+--			turtleID = io.read()
+--		until tonumber(turtleID) ~= nil
 		settings = {}
-		settings["turtleID"] = turtleID
+--		settings["turtleID"] = turtleID
+		settings.autofill = false
 		saveTable(settings, SETTINGS_FILE)
 		print("Settings for this program are stored in aspekt.cfg")
 	end
-	return tonumber(settings.turtleID)
+	return settings
 end
 
 function table.size(t)
@@ -303,12 +307,13 @@ end
 
 -- default mode
 function modeAspectMonitor()
+	os.loadAPI("button")
 	if m == nil then
 		print("Error, monitor not wrapped!")
 		exit(1)
 	end
 
---	turtleID = initializeTurtleId()
+	settings = initializeSettings()
 	
 	findHelperComputers()
 
