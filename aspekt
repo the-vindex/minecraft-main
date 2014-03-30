@@ -102,7 +102,7 @@ function printEssentia()
 end
 
 function getClick()
-   --local timerId = os.startTimer(15)
+   local timerId = os.startTimer(15)
    local event,side,x,y = os.pullEvent()
    scanEssentia()
    if event=="monitor_touch" then
@@ -127,6 +127,7 @@ function getClick()
         end
      end
    elseif event=="timer" and side == timerId then
+		print("Timer fired")
 		autofillEssentia()
    end
 end
@@ -327,7 +328,14 @@ function modeRemoteAspectMonitor()
 				scanEssentia()
 				while table.size(essentia) > 0 do
 					sleep(3)
+					-- making sure we don't hit the moment between golem empting alembic and furnace pushing more essentia
+					local repeater = 3
 					scanEssentia()
+					while table.size(essentia) == 0 and repeater >0 do
+						sleep(0.4)
+						scanEssentia()
+						repeater = repeater - 1
+					end
 				end
 				rednet.send(id, "Alembics Empty")
 			elseif msg.instruction == "thaum_checkin" then
