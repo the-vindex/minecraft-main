@@ -158,7 +158,6 @@ function autofillEssentia()
 			currEssentia = aspectName
 			fillAmt = AUTO_FILL_QUANTITY - quantity
 			fillEss()
-			break
 		end
 	end
 end
