@@ -24,16 +24,29 @@ function sortEss(t)
    end
 end
 
+function getAspectCount(peripheralName, aspectInfo)
+   local aspectName
+   local countasp 
+   if peripheralName == "tt_aspectContainer" then
+		countasp = peripheral.call(peripheralType, "getAspectCount", asp)
+		if countasp == nil then countasp = 0 end
+		aspectName = aspectInfo
+   elseif peripheralName == "tilejarvoid" then
+		countasp = aspectInfo[1]["quantity"]
+		aspectName = aspectInfo[1]["name"]
+   end
+   return string.lower(aspectName), countasp
+end
+
 function scanEssentia()
   essentia = {}
   for i,j in ipairs(jars) do
 	 local peripheralType = peripheral.getType(j)
      if peripheralType == "tt_aspectContainer" or peripheralType == "tilejarvoid" then
-       local asp = peripheral.call(j, "getAspects")
+       local asp = peripheral.call(peripheralType, "getAspects")
 	   
 	   if asp ~= nil then
-		   local countasp = peripheral.call(j, "getAspectCount", asp)
-		   if countasp == nil then countasp = 0 end
+			local aspectName, countasp = getAspectCount(j, asp)
 		   
 		   if countasp > 0 then
 			  if essentia[asp] == nil then
