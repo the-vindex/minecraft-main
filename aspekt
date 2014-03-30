@@ -1,7 +1,10 @@
 ----- Modified DW20 program which displays amount of essentia in jars
 rednet.open("top")
 os.loadAPI("button")
-local turtleID = 185
+local AUTO_FILL_QUANTITY = 50
+local FILL_LIMIT = 64
+local SETTINGS_FILE = "aspekt.cfg"
+local turtleID -- filled from settings file above
 local essentia = {}
 local jars = peripheral.getNames()
 local m = peripheral.wrap("right")
@@ -9,6 +12,7 @@ local monCoord = {}
 local currEssentia
 local fillAmt = 0
 local rowsActive = true
+
 
 function sortEss(t)
    local keys = {}
@@ -98,6 +102,7 @@ function printEssentia()
 end
 
 function getClick()
+   local timerId = os.startTimer(15)
    local event,side,x,y = os.pullEvent()
    if event=="monitor_touch" then
      if button.checkxy(x,y) then
@@ -109,7 +114,7 @@ function getClick()
           print(monCoord[x-(x%17)+1][y])
           currEssentia = monCoord[x-(x%17)+1][y]
           if currEssentia ~= nil then
-          if essentia[currEssentia] < 64 then
+          if essentia[currEssentia] < FILL_LIMIT then
              fillTable2()
           else
              m.clear()
@@ -120,7 +125,19 @@ function getClick()
           end
         end
      end
+   elseif event=="timer" and side == timerId then
+		autofillEssentia()
    end
+end
+
+function autofillEssentia()
+	for aspectName, quantity in pairs(essentia) do
+		if quantity < AUTO_FILL_QUANTITY then
+			currEssentia = aspectName
+			fillAmt = AUTO_FILL_QUANTITY - quantity
+			fillEss()
+		end
+	end
 end
 
 function refresh()
@@ -142,7 +159,7 @@ end
 function addEss(num)
    fillAmt = fillAmt + num
    if fillAmt < 0 then fillAmt = 0 end
-   if fillAmt > 64-essentia[currEssentia] then fillAmt = 64-essentia[currEssentia] end
+   if fillAmt > FILL_LIMIT-essentia[currEssentia] then fillAmt = FILL_LIMIT-essentia[currEssentia] end
    m.clear()
    fillTable2()
 end
@@ -181,11 +198,46 @@ function fillTable2()
    button.setTable("-1", addEss, -1, 8, 18, 8, 8)
    button.setTable("-5", addEss, -5, 20, 30, 8, 8)
    button.setTable("-10", addEss, -10, 32, 42, 8 ,8)
-   button.setTable("Refill Jar", addEss, 64-essentia[currEssentia], 8, 42, 10, 10)
+   button.setTable("Refill Jar", addEss, FILL_LIMIT-essentia[currEssentia], 8, 42, 10, 10)
    button.setTable("Execute Fill Request", fillEss, "", 8, 42, 16, 18)
    button.setTable("Cancel", cancel, "", 20, 30, 12, 14)
    button.label(7, 4, "Currently Adding "..fillAmt.." "..currEssentia.." essentia.")
    button.screen()
+end
+
+function saveTable(t,name)
+	local file = fs.open(name,"w")
+	file.write(textutils.serialize(t))
+	file.close()
+end
+
+function loadTable(name)
+	local file = fs.open(name,"r")
+	local data = file.readAll()
+	file.close()
+	return textutils.unserialize(data)
+end
+
+function initializeTurtleId()
+	local settings
+	if fs.exists(SETTINGS_FILE) then
+		settings = loadTable(SETTINGS_FILE)
+		if settings == nil or settings.turtleID == nil then
+			fs.delete(SETTINGS_FILE)
+			settings = nil
+		end
+	end
+	if settings == nil then
+		local turtleID
+		repeat
+			io.write("Input turtle ID for burning mana beans:")
+			turtleID = io.read()
+		until tonumber(turtleID) ~= nil
+		settings = {}
+		settings["turtleID"] = turtleID
+		saveTable(settings, SETTINGS_FILE)
+	end
+	return settings.turtleID
 end
 
 if m == nil then
@@ -193,6 +245,9 @@ if m == nil then
 	exit(1)
 end
 
+turtleID = initializeTurtleId()
+
 fillTable()
 refresh()
+
 while true do getClick() end

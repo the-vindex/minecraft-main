@@ -1,0 +1,5 @@
+while true; do 
+	cp /cygdrive/f/Games/minecraft-ftb/minecraft-main/aspekt "/cygdrive/f/Games/minecraft-ftb/Direwolf20_1_6_4/minecraft/saves/New World/computer/9"
+	sleep 5
+done
+
