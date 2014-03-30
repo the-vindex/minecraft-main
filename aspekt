@@ -43,6 +43,7 @@ function scanEssentia()
   for i,j in ipairs(jars) do
 	 local peripheralType = peripheral.getType(j)
      if peripheralType == "tt_aspectContainer" or peripheralType == "tilejarvoid" then
+	   print("Processing "..j)
        local asp = peripheral.call(peripheralType, "getAspects")
 	   
 	   if asp ~= nil then
