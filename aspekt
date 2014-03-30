@@ -24,44 +24,46 @@ function sortEss(t)
    end
 end
 
-function getAspectCount(peripheralName, aspectInfo)
+function getAspectCount(peripheralName, peripheralType, aspectInfo)
    local aspectName
    local countasp 
-   if peripheralName == "tt_aspectContainer" then
-		countasp = peripheral.call(peripheralType, "getAspectCount", asp)
+   if peripheralType == "tt_aspectContainer" then
+		countasp = peripheral.call(peripheralName, "getAspectCount", asp)
 		if countasp == nil then countasp = 0 end
 		aspectName = aspectInfo
-   elseif peripheralName == "tilejarvoid" then
+   elseif peripheralType == "tilejarvoid" then
 		countasp = aspectInfo[1]["quantity"]
 		aspectName = aspectInfo[1]["name"]
+   else 
+		error("Unknown type: "..peripheralType)
    end
+
    return string.lower(aspectName), countasp
 end
 
 function scanEssentia()
   essentia = {}
-  for i,j in ipairs(jars) do
-	 local peripheralType = peripheral.getType(j)
+  for i,peripheralName in ipairs(jars) do
+	 local peripheralType = peripheral.getType(peripheralName)
      if peripheralType == "tt_aspectContainer" or peripheralType == "tilejarvoid" then	   
-       local asp = peripheral.call(peripheralType, "getAspects")
-	   print("Processing "..j)
+       local asp = peripheral.call(peripheralName, "getAspects")
+
 	   if asp ~= nil then
 			
 			local aspectName
 			local countasp 
-			print(getAspectCount(j, asp))
-			aspectName, countasp = getAspectCount(j, asp)
-		   
-		   if countasp > 0 then
-			  if essentia[asp] == nil then
-				essentia[asp] = 0
+			aspectName, countasp = getAspectCount(peripheralName, peripheralType, asp)
+   
+--		   if countasp > 0 then
+			  if essentia[aspectName] == nil then
+				essentia[aspectName] = 0
 			  end
-			  essentia[asp] = essentia[asp] + math.floor(countasp)
-		   end
+			  essentia[aspectName] = essentia[aspectName] + math.floor(countasp)
+--		   end
 
-		   print(asp..":"..countasp)
+		   print(aspectName..":"..countasp)
 	   end
---     print(peripheral.getType(j))
+--     print(peripheral.getType(peripheralName))
      end
   end
 end

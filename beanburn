@@ -1,4 +1,4 @@
---Make sure there is an inventory above the turtle that can hold one of each mana bean you have.
+--Turtle expects Request logistics pipe beneath it, arcane furnace in front of it
  
 --Mana Bean item ID
 local manaBeanId =25366
