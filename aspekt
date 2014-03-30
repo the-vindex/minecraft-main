@@ -102,8 +102,9 @@ function printEssentia()
 end
 
 function getClick()
-   local timerId = os.startTimer(15)
+   --local timerId = os.startTimer(15)
    local event,side,x,y = os.pullEvent()
+   scanEssentia()
    if event=="monitor_touch" then
      if button.checkxy(x,y) then
         print("button")
@@ -135,6 +136,10 @@ function autofillEssentia()
 	for aspectName, quantity in pairs(essentia) do
 		if quantity < AUTO_FILL_QUANTITY then
 			print("Found insufficient "..aspectName)
+			scanEssentia()
+			if quantity ~= essentia[aspectName] then
+				print("Aspect is being refilled by golem, skipping cycle")
+			end
 			currEssentia = aspectName
 			fillAmt = AUTO_FILL_QUANTITY - quantity
 			fillEss()

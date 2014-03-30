@@ -33,6 +33,7 @@ function initializeBeans()
 			local aspectsValue = aspects["value"][1]["value"]["key"]
 			local aspectName = aspectsValue["value"]
 			aspectNameToUid[aspectName] = itemUid
+			print(aspectName..":"..itemUid)
 		end
 	end
 	return aspectNameToUid
@@ -48,7 +49,9 @@ function getItemCount()
 end
 
 function requestBeans(aspect,qty)
-  avail=req.getItemAmount(beans[aspect])
+  local uid = beans[aspect]
+  if uid == nil then return end
+  avail=req.getItemAmount(uid)
   print("available:"..avail)
   print("qty:"..qty)
   if avail<qty then
