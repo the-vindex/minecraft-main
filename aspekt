@@ -236,6 +236,7 @@ function initializeTurtleId()
 		settings = {}
 		settings["turtleID"] = turtleID
 		saveTable(settings, SETTINGS_FILE)
+		print("Settings for this program are stored in aspekt.cfg")
 	end
 	return settings.turtleID
 end
