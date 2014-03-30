@@ -337,7 +337,7 @@ function modeRemoteAspectMonitor()
 					local repeater = 3
 					scanEssentia()
 					while table.size(essentia) == 0 and repeater >0 do
-						sleep(0.4)
+						sleep(1)
 						scanEssentia()
 						repeater = repeater - 1
 					end
