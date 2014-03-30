@@ -77,13 +77,20 @@ function essentia(aspect, numAspect)
 end
  
 function awaitRednet()
-  local id, msg, dist = rednet.receive()
-  term.write(msg)
-  local essData = {}
-  essData = textutils.unserialize(msg)
-  print(essData[1]..":"..essData[2])
-  essentia(essData[1], tonumber(essData[2]))
-  rednet.send(id, "Complete")
+	local id, msg, dist = rednet.receive()
+	term.write(msg)
+	msg = textutils.unserialize(msg)
+	if msg == nil then print("Bogus message!") return end
+	
+	if msg.instruction == "thaum_checkin" then
+		rednet.send(id, "burnerTurtle")
+	end
+	local essData = msg
+	if msg.instruction == "burn" then
+		print(essData[1]..":"..essData[2])
+		essentia(essData[1], tonumber(essData[2]))
+		rednet.send(id, "Complete")
+	end
 end
 
 initializeTurtle()

@@ -173,17 +173,32 @@ function addEss(num)
 end
 
 function fillEss()
-   local essData = {}
+   local essData = rednetMessagePrepare("burn")
    essData[1] = currEssentia
    essData[2] = fillAmt
-   local sendData = ""
+   local sendData
    sendData = textutils.serialize(essData)
    rednet.send(turtleID, sendData)
    m.clear()
    button.label(7, 10, "Waiting for aspects to finish cooking....")
    button.label(7, 12, "Don't forget to refresh the screen after")
    button.label(7, 13, "the golem is done moving the essentia.")
-   rednet.receive()
+   
+   -- 1 - response from turtle about burning finished
+   local id, msg, dist
+   while msg ~= "Complete" do 
+		id, msg, dist = rednet.receive()
+   end
+   print("Turtle finished burning")
+   
+   -- 2 - request computer to confirm empty alembics
+   rednet.send(remoteAspectMonitorId, textutils.serialize(rednetMessagePrepare("notifyWhenEmpty")))
+   msg = nil
+   while msg ~= "Alembics Empty" do 
+		id, msg, dist = rednet.receive()
+   end
+   print("Golem emptied alembics")
+   
    m.clear()
    fillTable()
    refresh()
@@ -249,14 +264,85 @@ function initializeTurtleId()
 	return tonumber(settings.turtleID)
 end
 
-if m == nil then
-	print("Error, monitor not wrapped!")
-	exit(1)
+function table.size(t)
+	local count = 0 
+	for k,v in pairs(t) do
+		count = count + 1
+	end
+	return count
 end
 
-turtleID = initializeTurtleId()
+function rednetMessagePrepare(instruction)
+	local msg = {}
+	msg.instruction = instruction
+	return msg
+end
 
-fillTable()
-refresh()
+function findHelperComputers()
+	print("Looking for friends on rednet")
+   local expectedReplies = 2
+   local id, msg, dist
+   rednet.broadcast(textutils.serialize(rednetMessagePrepare("thaum_checkin")))
+   while expectedReplies > 0 do
+      id,msg,dist = rednet.receive()
+      
+      -- communication debugging
+      if msg ~= nil then print ("Got msg "..msg) end 
+      local computerName = msg
+      if computerName == "remoteAspectMonitor" then
+		remoteAspectMonitorId = id
+		expectedReplies = expectedReplies - 1
+      elseif computerName == "burnerTurtle" then
+		turtleID = id
+		expectedReplies = expectedReplies - 1
+      elseif computerName == "thaum_checkin" then
+      end
+   end    
+end
 
-while true do getClick() end
+-- default mode
+function modeAspectMonitor()
+	if m == nil then
+		print("Error, monitor not wrapped!")
+		exit(1)
+	end
+
+--	turtleID = initializeTurtleId()
+	
+	findHelperComputers()
+
+	fillTable()
+	refresh()
+
+	while true do getClick() end
+end
+
+function modeRemoteAspectMonitor()
+	while true do
+		local id, msg, dist = rednet.receive()
+		term.write(msg)
+		msg = textutils.unserialize(msg)
+		if msg ~= nil then
+			if msg.instruction == "notifyWhenEmpty" then
+				scanEssentia()
+				while table.size(essentia) > 0 do
+					sleep(3)
+					scanEssentia()
+				end
+				rednet.send(id, "Alembics Empty")
+			elseif msg.instruction == "thaum_checkin" then
+				rednet.send(id, "remoteAspectMonitor")
+			end
+		else
+			print("Bogus message!")
+		end
+	end
+end
+
+local args = {...}
+if args[1] == "remoteAspectMonitor" then
+	print("Remote aspect monitor mode")
+	modeRemoteAspectMonitor()
+else
+	modeAspectMonitor()
+end
