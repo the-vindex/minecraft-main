@@ -334,10 +334,10 @@ function modeRemoteAspectMonitor()
 				while table.size(essentia) > 0 do
 					sleep(3)
 					-- making sure we don't hit the moment between golem empting alembic and furnace pushing more essentia
-					local repeater = 3
+					local repeater = 30
 					scanEssentia()
 					while table.size(essentia) == 0 and repeater >0 do
-						sleep(1)
+						sleep(0.1)
 						scanEssentia()
 						repeater = repeater - 1
 					end
