@@ -138,7 +138,17 @@ end
 
 function autofillEssentia()
 	print("Autorefill started")
+	local minAspect = nil
+	local minQuantity = 10000
 	for aspectName, quantity in pairs(essentia) do
+		if quantity < minQuantity and quantity < AUTO_FILL_QUANTITY then
+			minAspect = aspectName
+			minQuantity = quantity
+		end
+	end
+	local aspectName = minAspect
+	local quantity = minQuantity
+	if minAspect ~= nil then
 		if quantity < AUTO_FILL_QUANTITY then
 			print("Found insufficient "..aspectName)
 			scanEssentia()
