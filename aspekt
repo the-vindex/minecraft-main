@@ -35,7 +35,7 @@ function getAspectCount(peripheralName, aspectInfo)
 		countasp = aspectInfo[1]["quantity"]
 		aspectName = aspectInfo[1]["name"]
    end
-   return string.lower(aspectName), countasp
+   return unpack({string.lower(aspectName), countasp})
 end
 
 function scanEssentia()
@@ -46,7 +46,8 @@ function scanEssentia()
        local asp = peripheral.call(peripheralType, "getAspects")
 	   
 	   if asp ~= nil then
-			local aspectName, countasp = getAspectCount(j, asp)
+			local aspectName, local countasp 
+			aspectName, countasp = getAspectCount(j, asp)
 		   
 		   if countasp > 0 then
 			  if essentia[asp] == nil then
