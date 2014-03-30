@@ -44,9 +44,9 @@ function scanEssentia()
 	 local peripheralType = peripheral.getType(j)
      if peripheralType == "tt_aspectContainer" or peripheralType == "tilejarvoid" then	   
        local asp = peripheral.call(peripheralType, "getAspects")
-	   
+	   print("Processing "..j)
 	   if asp ~= nil then
-			print("Processing "..j)
+			
 			local aspectName
 			local countasp 
 			print(getAspectCount(j, asp))
