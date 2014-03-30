@@ -194,9 +194,7 @@ function fillEss()
    sendData = textutils.serialize(essData)
    rednet.send(turtleID, sendData)
    m.clear()
-   button.label(7, 10, "Waiting for aspects to finish cooking....")
-   button.label(7, 12, "Don't forget to refresh the screen after")
-   button.label(7, 13, "the golem is done moving the essentia.")
+   button.label(7, 10, "Waiting for aspects of ["..currEssentia.."] to finish cooking....")
    
    -- 1 - response from turtle about burning finished
    local id, msg, dist
