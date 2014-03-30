@@ -11,6 +11,7 @@ local remoteAspectMonitorId -- dynamically discovered using wireless modem
 local essentia = {}
 local jars = peripheral.getNames()
 local m = peripheral.wrap("right")
+local golem = peripheral.wrap("right")
 local monCoord = {}
 local currEssentia
 local fillAmt = 0
@@ -324,6 +325,7 @@ function modeAspectMonitor()
 end
 
 function modeRemoteAspectMonitor()
+
 	while true do
 		local id, msg, dist = rednet.receive()
 		term.write(msg)
@@ -332,15 +334,12 @@ function modeRemoteAspectMonitor()
 			if msg.instruction == "notifyWhenEmpty" then
 				scanEssentia()
 				while table.size(essentia) > 0 do
-					sleep(3)
-					-- making sure we don't hit the moment between golem empting alembic and furnace pushing more essentia
-					local repeater = 30
+					sleep(6)
+					local x,y,z,dir = golem.getHome()
+					golem.setHome(x-1,y,z,dir)
+					sleep(2)
 					scanEssentia()
-					while table.size(essentia) == 0 and repeater >0 do
-						sleep(0.1)
-						scanEssentia()
-						repeater = repeater - 1
-					end
+					golem.setHome(x,y,z,dir)
 				end
 				rednet.send(id, "Alembics Empty")
 			elseif msg.instruction == "thaum_checkin" then
