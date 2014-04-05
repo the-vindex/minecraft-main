@@ -335,7 +335,7 @@ function modeRemoteAspectMonitor()
 
 	while true do
 		local id, msg, dist = rednet.receive()
-		term.write(msg)
+		print(msg)
 		msg = textutils.unserialize(msg)
 		if msg ~= nil then
 			if msg.instruction == "notifyWhenEmpty" then
