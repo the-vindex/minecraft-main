@@ -13,8 +13,8 @@ while true do
 			chest.condenseItems()
 			chest.pushItem("up",1,64-turtleCount,1)
 		end
+		turtle.dropUp()
+		sleep(5)
 	end
 	
-	turtle.dropUp()
-	sleep(5)
 end
