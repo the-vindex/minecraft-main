@@ -1,5 +1,5 @@
 local FULL_STACK = 64
-local chest = peripheral.wrap("back")
+local chest = peripheral.wrap("bottom")
 print(chest)
 while true do
 	turtle.select(1)
