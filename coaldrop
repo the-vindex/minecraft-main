@@ -7,6 +7,7 @@ while true do
 	sleep(5)
 	
 	local turtleCount = turtle.getItemCount(1)
+	print(turtleCount)
 	if (turtleCount < FULL_STACK) then
 		chest.condenseItems()
 		chest.pushItem("up",0,64-turtleCount,0)
