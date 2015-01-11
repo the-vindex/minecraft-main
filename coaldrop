@@ -9,7 +9,7 @@ while true do
 	local turtleCount = turtle.getItemCount(1)
 	if (turtleCount < FULL_STACK) then
 		chest.condenseItems()
-		chest.pushItem("up",1,64-turtleCount,1)
+		chest.pushItem("up",0,64-turtleCount,0)
 	end
 	
 	turtle.dropUp()
