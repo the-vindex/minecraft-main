@@ -6,11 +6,13 @@ while true do
 	turtle.suckUp()
 	sleep(5)
 	
-	local turtleCount = turtle.getItemCount(1)
-	print(turtleCount)
-	if (turtleCount < FULL_STACK) then
-		chest.condenseItems()
-		chest.pushItem("up",1,64-turtleCount,1)
+	if (not(rs.testBundledInput("front",colors.blue))) then
+		local turtleCount = turtle.getItemCount(1)
+		print(turtleCount)
+		if (turtleCount < FULL_STACK) then
+			chest.condenseItems()
+			chest.pushItem("up",1,64-turtleCount,1)
+		end
 	end
 	
 	turtle.dropUp()
