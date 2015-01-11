@@ -26,6 +26,6 @@ for i,filePath in ipairs(files) do
 		--delete last directory so that we can place file there
 		fs.delete(filePath)
 	end
-	
+	fs.delete(filePath)
 	getFile(filePath,filePath)
 end
