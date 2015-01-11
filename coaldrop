@@ -1,0 +1,17 @@
+local FULL_STACK = 64
+local chest = peripheral.wrap("back")
+print(chest)
+while true do
+	turtle.select(1)
+	turtle.suckDown()
+	sleep(5)
+	
+	local turtleCount = turtle.getItemCount(1)
+	if (turtleCount < FULL_STACK) then
+		chest.condenseItems()
+		chest.pushItem("south",1,64,1)
+	end
+	
+	turtle.dropDown()
+	sleep(5)
+end
