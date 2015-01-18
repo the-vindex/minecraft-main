@@ -1,0 +1,31 @@
+
+
+function growOrBreak()
+	local result,data=turtle.inspect()
+	if result and data ~= nil then
+		local name = data["name"]
+		local meta = data["metadata"]
+		local isPneu = string.find(name, "PneumaticCraft")
+		if isPneu == 1 then
+			print("Yes, this is seed")
+			if meta == 6 or meta == 13 then
+				print("Mature seed")
+				turtle.dig()
+				turtle.select(2)
+				turtle.suck()
+				turtle.drop(1)
+			else
+				turtle.select(1)
+				turtle.place()
+			end
+		end
+	else
+		turtle.select(2)
+		turtle.drop()
+	end
+end
+
+while true do
+	growOrBreak()
+	sleep(1)
+end
