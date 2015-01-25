@@ -1,0 +1,1 @@
+while true; do cp 'F:\Games\minecraft-ftb\minecraft-main\pneumaticGrow' 'f:\Games\craftzone-client\instances\mechanik\minecraft\saves\TestWord\computer\0'; sleep 2; done

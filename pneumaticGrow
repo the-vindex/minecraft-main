@@ -1,3 +1,4 @@
+local SAFETY_COUNTER_START=3
 
 
 function growOrBreak()
@@ -25,7 +26,36 @@ function growOrBreak()
 	end
 end
 
+function setTurtleFull()
+	error()
+end
+
+local safetyCounter = SAFETY_COUNTER_START
 while true do
 	growOrBreak()
 	sleep(1)
+	safetyCounter = safetyCounter - 1
+	if (safetyCounter <= 0) then
+		local targetClearingSlot = 16
+		while targetClearingSlot > 2 and turtle.getItemCount(targetClearingSlot) == 64 do
+			targetClearingSlot = targetClearingSlot - 1
+		end
+		if targetClearingSlot == 2 then
+			setTurtleFull()
+		else			
+			for turtleSlot = 2,15 do
+				turtle.select(turtleSlot)
+				turtle.transferTo(targetClearingSlot)
+				if turtle.getItemCount(targetClearingSlot) == 64 then
+					targetClearingSlot = targetClearingSlot - 1
+				end
+				if turtleSlot >= targetClearingSlot then
+					break
+				end
+			end
+		end
+		
+		safetyCounter = SAFETY_COUNTER_START
+	end
 end
+
