@@ -22,7 +22,7 @@ function growOrBreak()
 		end
 	else
 		turtle.select(2)
-		turtle.drop()
+		turtle.drop(1)
 	end
 end
 
