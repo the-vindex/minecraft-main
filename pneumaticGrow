@@ -43,7 +43,7 @@ while true do
 		if targetClearingSlot == 2 then
 			setTurtleFull()
 		else			
-			for turtleSlot = 2,15 do
+			for turtleSlot = 3,15 do
 				turtle.select(turtleSlot)
 				turtle.transferTo(targetClearingSlot)
 				if turtle.getItemCount(targetClearingSlot) == 64 then
